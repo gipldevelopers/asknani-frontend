@@ -13,3 +13,14 @@
   width: max-content;
   animation: scroll 30s linear infinite;
 }
+
+@theme {
+  --color-primary: #67a5d9;
+  --color-primary-hover: #4f8fc6;
+
+  --color-secondary: #f26e63;
+  --color-secondary-hover: #d9584f;
+
+  --color-accent: #fec959;
+  --color-accent-hover: #e6b144;
+}

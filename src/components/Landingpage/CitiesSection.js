@@ -79,7 +79,7 @@ export default function CitiesSection() {
                         onClick={() => scroll("left")}
                         className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-indigo-50 hidden sm:block"
                     >
-                        <ChevronLeft className="h-6 w-6 text-indigo-600" />
+                        <ChevronLeft className="h-6 w-6 text-primary" />
                     </button>
 
                     {/* Cities List */}
@@ -116,13 +116,13 @@ export default function CitiesSection() {
                         onClick={() => scroll("right")}
                         className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-indigo-50 hidden sm:block"
                     >
-                        <ChevronRight className="h-6 w-6 text-indigo-600" />
+                        <ChevronRight className="h-6 w-6 text-primary" />
                     </button>
                 </div>
 
                 {/* CTA */}
                 <div className="text-center mt-8">
-                    <button className="px-6 py-3 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition">
+                    <button className="px-6 py-3 bg-primary text-white rounded-full shadow hover:bg-primary transition">
                         View All Cities
                     </button>
                 </div>

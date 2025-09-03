@@ -9,6 +9,8 @@ import {
   Briefcase,
   Building2,
 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -19,12 +21,15 @@ export default function Footer() {
           {/* Brand section */}
           <div className="lg:col-span-2">
             <div className="flex items-center mb-5">
-              <div className="bg-indigo-600 h-10 w-10 rounded-lg flex items-center justify-center mr-3">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-                CareFinder
-              </h3>
+              <Link href="/" className="flex items-center space-x-2">
+                <Image
+                  src="/logo.png" // 👉 put this in /public
+                  alt="Marketplace Logo"
+                  width={140}
+                  height={45}
+                  className="rounded-lg"
+                />
+              </Link>
             </div>
             <p className="text-gray-400 mb-6 max-w-md text-lg">
               Connecting parents with the perfect daycare providers. Making
@@ -42,7 +47,7 @@ export default function Footer() {
                   placeholder="Enter your email"
                   className="px-4 py-3 bg-gray-700 border border-gray-600 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full"
                 />
-                <button className="bg-indigo-600 hover:bg-indigo-700 px-4 py-3 rounded-r-lg font-medium transition-colors">
+                <button className="bg-primary hover:bg-primary px-4 py-3 rounded-r-lg font-medium transition-colors">
                   Subscribe
                 </button>
               </div>
@@ -52,25 +57,25 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="bg-gray-700 hover:bg-indigo-600 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
+                className="bg-gray-700 hover:bg-primary h-10 w-10 rounded-full flex items-center justify-center transition-colors"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="bg-gray-700 hover:bg-indigo-600 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
+                className="bg-gray-700 hover:bg-primary h-10 w-10 rounded-full flex items-center justify-center transition-colors"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="bg-gray-700 hover:bg-indigo-600 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
+                className="bg-gray-700 hover:bg-primary h-10 w-10 rounded-full flex items-center justify-center transition-colors"
               >
                 <Twitter className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="bg-gray-700 hover:bg-indigo-600 h-10 w-10 rounded-full flex items-center justify-center transition-colors"
+                className="bg-gray-700 hover:bg-primary h-10 w-10 rounded-full flex items-center justify-center transition-colors"
               >
                 <Linkedin className="h-5 w-5" />
               </a>

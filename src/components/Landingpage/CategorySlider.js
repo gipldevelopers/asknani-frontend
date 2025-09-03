@@ -2,6 +2,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { Baby, Users, GraduationCap, Heart, Clock, Utensils, ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 const categories = [
   {
@@ -80,7 +81,7 @@ const CategorySlider = () => {
     if (isPaused) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex(prevIndex => 
+      setCurrentIndex(prevIndex =>
         prevIndex === categories.length - 1 ? 0 : prevIndex + 1
       );
     }, 3000);
@@ -113,7 +114,7 @@ const CategorySlider = () => {
         </div>
 
         {/* Slider Container */}
-        <div 
+        <div
           className="relative overflow-hidden"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
@@ -133,7 +134,7 @@ const CategorySlider = () => {
           </button>
 
           {/* Slider Track */}
-          <div 
+          <div
             ref={sliderRef}
             className="flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * (100 / 4)}%)` }}
@@ -144,13 +145,14 @@ const CategorySlider = () => {
                 <div key={index} className="flex-shrink-0 w-1/4 px-3">
                   <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 group hover:-translate-y-2 cursor-pointer border border-gray-100">
                     <div className="flex flex-col items-center text-center">
+
                       <div className={`p-4 rounded-full ${category.color} text-white mb-4 group-hover:scale-110 transition-transform duration-300`}>
                         <IconComponent className="h-8 w-8" />
                       </div>
                       <h3 className="text-xl font-semibold text-gray-900 mb-2">
                         {category.title}
                       </h3>
-                      <p className="text-sm text-indigo-600 font-medium mb-2">
+                      <p className="text-sm text-primary font-medium mb-2">
                         {category.subtitle}
                       </p>
                       <p className="text-sm text-gray-600 mb-4">
@@ -173,18 +175,20 @@ const CategorySlider = () => {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${index === currentIndex ? "bg-indigo-600 scale-125" : "bg-gray-300 hover:bg-gray-400"}`}
+              className={`w-3 h-3 rounded-full transition-all ${index === currentIndex ? "bg-primary scale-125" : "bg-gray-300 hover:bg-gray-400"}`}
             />
           ))}
         </div>
 
         <div className="text-center mt-12">
-          <button className="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors font-medium shadow-md hover:shadow-lg">
-            View All Categories
-            <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <Link href="/daycares">
+            <button className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-full hover:bg-primary transition-colors font-medium shadow-md hover:shadow-lg">
+              View All Categories
+              <svg className="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </Link>
         </div>
       </div>
     </section>

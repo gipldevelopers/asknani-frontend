@@ -15,6 +15,7 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 // ------------------ Sample data (replace with API later) ------------------
 const indianCities = [
@@ -431,7 +432,7 @@ export default function DaycareListingsPage() {
             {(debouncedSearch || selectedCity !== "All Cities" || selectedCategories.length || minRating > 0 || maxPrice < 1000) && (
               <button
                 onClick={clearFilters}
-                className="text-xs text-indigo-600 underline underline-offset-2 ml-auto"
+                className="text-xs text-primary underline underline-offset-2 ml-auto"
               >
                 Clear all
               </button>
@@ -461,7 +462,7 @@ export default function DaycareListingsPage() {
                     key={city}
                     onClick={() => setSelectedCity(city)}
                     className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${selectedCity === city
-                      ? "bg-indigo-600 text-white"
+                      ? "bg-primary text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                   >
@@ -479,7 +480,7 @@ export default function DaycareListingsPage() {
                     key={c}
                     onClick={() => toggleCategory(c)}
                     className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${selectedCategories.includes(c)
-                      ? "bg-indigo-600 text-white"
+                      ? "bg-primary text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                       }`}
                   >
@@ -630,7 +631,7 @@ export default function DaycareListingsPage() {
                         key={r}
                         onClick={() => setMinRating(r)}
                         className={`rounded-lg px-3 py-2 text-sm ${minRating === r
-                          ? "bg-indigo-600 text-white"
+                          ? "bg-primary text-white"
                           : "bg-gray-100 text-gray-700"
                           }`}
                       >
@@ -668,7 +669,7 @@ export default function DaycareListingsPage() {
                         key={c}
                         onClick={() => toggleCategory(c)}
                         className={`rounded-full px-3 py-1.5 text-xs ${selectedCategories.includes(c)
-                          ? "bg-indigo-600 text-white"
+                          ? "bg-primary text-white"
                           : "bg-gray-100 text-gray-700"
                           }`}
                       >
@@ -703,7 +704,7 @@ export default function DaycareListingsPage() {
                   </button>
                   <button
                     onClick={() => setShowFilters(false)}
-                    className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
+                    className="flex-1 rounded-lg bg-primary px-4 py-2 text-sm text-white hover:bg-primary"
                   >
                     Apply
                   </button>
@@ -784,8 +785,8 @@ function FeaturedCard({ d, favs, onFav }) {
   return (
     <div className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:shadow-md">
       <div className="relative h-40 w-full overflow-hidden">
-        <img src={d.image} alt={d.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
-        <span className="absolute left-3 top-3 rounded bg-indigo-600 px-2 py-1 text-xs font-medium text-white">Featured</span>
+        <img  src={d.image} alt={d.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        <span className="absolute left-3 top-3 rounded bg-primary px-2 py-1 text-xs font-medium text-white">Featured</span>
         <button
           aria-label="Save to favourites"
           onClick={() => onFav(d.id)}
@@ -798,7 +799,7 @@ function FeaturedCard({ d, favs, onFav }) {
       <div className="p-4">
         <div className="mb-1 flex items-start justify-between gap-2">
           <h4 className="line-clamp-1 text-sm font-semibold">{d.name}</h4>
-          <span className="text-sm font-semibold text-indigo-600">{d.price}</span>
+          <span className="text-sm font-semibold text-primary">{d.price}</span>
         </div>
         <div className="mb-1 flex items-center text-xs text-gray-600">
           <MapPin className="mr-1 h-3.5 w-3.5" /> {d.location}
@@ -822,7 +823,7 @@ function ResultCard({ d, favs, onFav }) {
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         {d.isFeatured && (
-          <span className="absolute left-3 top-3 rounded bg-indigo-600 px-2 py-1 text-xs font-medium text-white">
+          <span className="absolute left-3 top-3 rounded bg-primary px-2 py-1 text-xs font-medium text-white">
             Featured
           </span>
         )}
@@ -840,7 +841,7 @@ function ResultCard({ d, favs, onFav }) {
           <h3 className="line-clamp-1 text-base font-semibold text-gray-900">
             {d.name}
           </h3>
-          <p className="shrink-0 text-base font-bold text-indigo-600">{d.price}</p>
+          <p className="shrink-0 text-base font-bold text-primary">{d.price}</p>
         </div>
         <div className="mb-2 flex items-center text-sm text-gray-600">
           <MapPin className="mr-1 h-4 w-4" />
@@ -864,7 +865,7 @@ function ResultCard({ d, favs, onFav }) {
         </div>
         <div className="mt-4 flex items-center justify-between">
           <Link href={"/daycares/new-page"}>
-            <button className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+            <button className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary">
               View details
             </button>
           </Link>
@@ -881,7 +882,7 @@ function CompactRow({ d, favs, onFav }) {
       <div className="relative h-16 w-20 overflow-hidden rounded-lg">
         <img src={d.image} alt="" className="h-full w-full object-cover" />
         {d.isFeatured && (
-          <span className="absolute left-1 top-1 rounded bg-indigo-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-white">
             Featured
           </span>
         )}
@@ -889,7 +890,7 @@ function CompactRow({ d, favs, onFav }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <h3 className="truncate text-sm font-semibold text-gray-900">{d.name}</h3>
-          <p className="shrink-0 text-sm font-bold text-indigo-600">{d.price}</p>
+          <p className="shrink-0 text-sm font-bold text-primary">{d.price}</p>
         </div>
         <div className="mt-0.5 flex items-center gap-2 text-xs text-gray-600">
           <RatingStars rating={d.rating} />
@@ -910,7 +911,7 @@ function CompactRow({ d, favs, onFav }) {
           <Heart className="h-4 w-4" />
         </button>
         <Link href={"/daycares/new-page"}>
-          <button className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs text-white hover:bg-indigo-700">
+          <button className="rounded-md bg-primary px-3 py-1.5 text-xs text-white hover:bg-primary">
             View
           </button>
         </Link>
@@ -927,7 +928,7 @@ function EmptyState({ onReset }) {
       <p className="mt-1 text-sm text-gray-600">Try changing or clearing filters to see more options.</p>
       <button
         onClick={onReset}
-        className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
+        className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm text-white hover:bg-primary"
       >
         Clear all filters
       </button>

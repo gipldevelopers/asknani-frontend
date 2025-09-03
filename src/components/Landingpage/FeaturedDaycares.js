@@ -110,12 +110,12 @@ const featuredDaycares = [
                 </p>
 
                 {/* Price */}
-                <p className="text-xl font-bold text-indigo-600 mb-4">
+                <p className="text-xl font-bold text-primary mb-4">
                   {daycare.price}
                 </p>
 
                 {/* Button */}
-                <button className="mt-auto w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2.5 rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-colors shadow">
+                <button className="mt-auto w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:primary-hover transition-colors shadow">
                   Book a Tour
                 </button>
               </div>

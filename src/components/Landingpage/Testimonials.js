@@ -87,7 +87,7 @@ export default function Testimonials() {
                             >
                                 {/* Avatar */}
                                 <div className="flex items-center mb-4">
-                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold mr-4">
+                                    <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-primary font-bold mr-4">
                                         {t.initials}
                                     </div>
                                     <div>

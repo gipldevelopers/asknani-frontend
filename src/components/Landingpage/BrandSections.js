@@ -19,7 +19,7 @@ export default function BrandSections() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-3xl font-bold text-indigo-600">1</span>
+                <span className="text-3xl font-bold text-primary">1</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Search & Discover</h3>
               <p className="text-gray-600">
@@ -29,7 +29,7 @@ export default function BrandSections() {
             
             <div className="text-center">
               <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-3xl font-bold text-indigo-600">2</span>
+                <span className="text-3xl font-bold text-primary">2</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Compare & Connect</h3>
               <p className="text-gray-600">
@@ -39,7 +39,7 @@ export default function BrandSections() {
             
             <div className="text-center">
               <div className="bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-3xl font-bold text-indigo-600">3</span>
+                <span className="text-3xl font-bold text-primary">3</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Book & Pay Securely</h3>
               <p className="text-gray-600">
@@ -109,7 +109,7 @@ export default function BrandSections() {
 <Testimonials/>
       
       {/* CTA Section */}
-      <section className="py-16 bg-indigo-600 text-white">
+      <section className="py-16 bg-primary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Find Your Perfect Daycare?
@@ -118,10 +118,10 @@ export default function BrandSections() {
             Join thousands of parents who have found quality childcare through CareFinder
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-            <button className="px-8 py-3 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+            <button className="px-8 py-3 bg-white text-primary rounded-lg font-bold hover:bg-gray-100 transition-colors">
               Sign Up Now
             </button>
-            <button className="px-8 py-3 border border-white text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors">
+            <button className="px-8 py-3 border border-white text-white rounded-lg font-bold hover:bg-primary transition-colors">
               Browse Daycares
             </button>
           </div>

@@ -149,7 +149,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                         >
                             <Heart className="h-5 w-5" />
                         </button>
-                        <button className="rounded-lg bg-indigo-600 px-3 py-2 text-sm text-white" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
+                        <button className="rounded-lg bg-primary px-3 py-2 text-sm text-white" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
                             Book a Visit
                         </button>
                     </div>
@@ -191,7 +191,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                             </div>
 
                             <div className="flex items-start gap-2">
-                                <User className="h-5 w-5 text-indigo-600" />
+                                <User className="h-5 w-5 text-primary" />
                                 <div>
                                     <div className="text-sm font-medium">Staff</div>
                                     <div className="text-xs text-gray-600">{daycare.staff.length} qualified caregivers</div>
@@ -213,7 +213,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                     <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
                         <div className="flex items-center justify-between">
                             <h3 className="text-base font-semibold">Meet the team</h3>
-                            <button className="text-sm text-indigo-600">View all</button>
+                            <button className="text-sm text-primary">View all</button>
                         </div>
                         <div className="mt-3 grid grid-cols-2 gap-3">
                             {daycare.staff.map((s) => (
@@ -284,7 +284,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                                 <input type="text" placeholder="Child's Name" value={childName} onChange={(e) => setChildName(e.target.value)} className="rounded-lg border border-gray-200 p-2" />
                                 <input type="number" min={0} placeholder="Child's Age (years)" value={childAge} onChange={(e) => setChildAge(Number(e.target.value))} className="rounded-lg border-gray-200 border p-2" />
                                 <textarea placeholder="Special requirements (allergies, meds, notes)" value={specialReq} onChange={(e) => setSpecialReq(e.target.value)} className="rounded-lg border border-gray-200 p-2" rows={3} />
-                                <button onClick={startBooking} className="rounded-lg bg-indigo-600 px-4 py-2 text-white">Book & Pay</button>
+                                <button onClick={startBooking} className="rounded-lg bg-primary px-4 py-2 text-white">Book & Pay</button>
                             </div>
                         </div>
                     </div>
@@ -293,7 +293,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                     <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
                         <div className="flex items-center justify-between">
                             <h3 className="text-base font-semibold">Parent reviews</h3>
-                            <button onClick={() => setShowReviewModal(true)} className="text-sm text-indigo-600">Write a review</button>
+                            <button onClick={() => setShowReviewModal(true)} className="text-sm text-primary">Write a review</button>
                         </div>
                         <div className="mt-3 space-y-3">
                             {reviews.map(r => (
@@ -326,13 +326,13 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <div className="text-sm text-gray-600">From</div>
-                                    <div className="text-xl font-bold text-indigo-600">{currency(daycare.priceFrom)}</div>
+                                    <div className="text-xl font-bold text-primary">{currency(daycare.priceFrom)}</div>
                                 </div>
                                 <div className="text-right text-sm text-gray-600">{daycare.rating} <Star className="inline h-4 w-4 text-amber-400" /></div>
                             </div>
 
                             <div className="mt-3 space-y-2">
-                                <button className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-white">Request a Visit</button>
+                                <button className="w-full rounded-lg bg-primary px-4 py-2 text-white">Request a Visit</button>
                                 <button className="w-full rounded-lg border border-gray-200 px-4 py-2">Message Daycare</button>
                                 <a className="block text-center text-sm text-gray-600 mt-1" href={`tel:${daycare.phone}`}><Phone className="inline h-4 w-4 mr-1" /> Call</a>
                             </div>
@@ -349,7 +349,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                             <h4 className="text-sm font-semibold">Location</h4>
                             <p className="text-xs text-gray-600 mt-2">{daycare.address}</p>
                             <div className="mt-3 h-36 w-full bg-gray-100 rounded-md flex items-center justify-center text-xs text-gray-500">Map placeholder</div>
-                            <a className="mt-2 inline-flex items-center gap-1 text-sm text-indigo-600" href="#" onClick={(e) => { e.preventDefault(); window.open(daycare.mapEmbedSrc, '_blank') }}>Open in maps <ArrowUpRight className="h-4 w-4" /></a>
+                            <a className="mt-2 inline-flex items-center gap-1 text-sm text-primary" href="#" onClick={(e) => { e.preventDefault(); window.open(daycare.mapEmbedSrc, '_blank') }}>Open in maps <ArrowUpRight className="h-4 w-4" /></a>
                         </div>
                     </div>
                 </aside>
@@ -372,7 +372,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                             <div><strong>Notes:</strong> {specialReq || '—'}</div>
                         </div>
                         <div className="mt-4 flex gap-2">
-                            <button onClick={() => confirmBooking()} className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-white">Pay & Confirm</button>
+                            <button onClick={() => confirmBooking()} className="flex-1 rounded-lg bg-primary px-4 py-2 text-white">Pay & Confirm</button>
                             <button onClick={() => setShowBookingModal(false)} className="flex-1 rounded-lg border px-4 py-2">Cancel</button>
                         </div>
                         <div className="mt-3 text-xs text-gray-500">Payments powered by your chosen gateway (integrate real gateway on server).</div>
@@ -422,7 +422,7 @@ function ReviewModal({ onClose, onSubmit }) {
                     </div>
                     <textarea placeholder="Share your experience" value={text} onChange={(e) => setText(e.target.value)} className="w-full rounded-lg border p-2" rows={4} />
                     <div className="flex gap-2">
-                        <button onClick={handle} className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-white">Submit review</button>
+                        <button onClick={handle} className="flex-1 rounded-lg bg-primary px-4 py-2 text-white">Submit review</button>
                         <button onClick={onClose} className="flex-1 rounded-lg border px-4 py-2">Cancel</button>
                     </div>
                 </div>

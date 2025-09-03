@@ -247,7 +247,7 @@ export default function DaycareListings() {
                     <MapPin size={14} className="mr-1 flex-shrink-0" />
                     <span className="line-clamp-1">{daycare.location}</span>
                   </div>
-                  <p className="text-lg font-bold text-indigo-600 mb-3">{daycare.price}</p>
+                  <p className="text-lg font-bold text-primary mb-3">{daycare.price}</p>
 
                   {/* Scrollable Features Section */}
                   <div className="mb-4 overflow-y-auto max-h-32 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
@@ -271,7 +271,7 @@ export default function DaycareListings() {
 
                 {/* Sticky Button at Bottom */}
                 <div className="p-4 pt-0 mt-auto sticky bottom-0 bg-white border-t border-gray-100">
-                  <button className="w-full bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm shadow-md">
+                  <button className="w-full bg-primary text-white py-2.5 rounded-lg hover:bg-primary transition-colors font-medium text-sm shadow-md">
                     View Details
                   </button>
                 </div>
@@ -290,7 +290,7 @@ export default function DaycareListings() {
 
         {filteredDaycares.length > 0 && (
           <div className="text-center mt-10">
-            <button className="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-full hover:bg-indigo-50 transition-colors font-medium">
+            <button className="px-6 py-3 border border-indigo-600 text-primary rounded-full hover:bg-indigo-50 transition-colors font-medium">
               Load More Daycares
             </button>
           </div>
