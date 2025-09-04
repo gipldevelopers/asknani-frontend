@@ -444,7 +444,7 @@ export default function DaycareListingsPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         {/* Discovery rows (hidden when filtering/searching) */}
         {!isFiltering && (
-          <section className="space-y-6">
+          <section className="space-y-6 mb-2">
             {/* Cities carousel */}
             <Card title="Browse by City" action={
               <div className="flex gap-2">
@@ -471,37 +471,37 @@ export default function DaycareListingsPage() {
                 ))}
               </div>
             </Card>
-
-            {/* Categories quick picks */}
-            <Card title="Popular Features">
-              <div ref={categoriesScrollRef} className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-                {categories.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => toggleCategory(c)}
-                    className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${selectedCategories.includes(c)
-                      ? "bg-primary text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
-                  >
-                    {c}
-                  </button>
+          </section>
+        )}
+        <section className="space-y-6 mb-2">
+          <Card title="Popular Features">
+            <div ref={categoriesScrollRef} className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+              {categories.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => toggleCategory(c)}
+                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${selectedCategories.includes(c)
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </Card>
+        </section>
+        {!isFiltering && (
+          featuredDaycares.length > 0 && (
+            <section className="space-y-6">
+              <h2 className="text-lg font-semibold mb-3">Featured Daycares</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {featuredDaycares.slice(0, 6).map((d) => (
+                  <FeaturedCard key={d.id} d={d} favs={favs} onFav={toggleFav} />
                 ))}
               </div>
-            </Card>
-
-            {/* Featured */}
-            {featuredDaycares.length > 0 && (
-              <section>
-                <h2 className="text-lg font-semibold mb-3">Featured Daycares</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {featuredDaycares.slice(0, 6).map((d) => (
-                    <FeaturedCard key={d.id} d={d} favs={favs} onFav={toggleFav} />
-                  ))}
-                </div>
-              </section>
-            )}
-          </section>
+            </section>
+          )
         )}
 
         {/* Results header */}
@@ -785,7 +785,7 @@ function FeaturedCard({ d, favs, onFav }) {
   return (
     <div className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:shadow-md">
       <div className="relative h-40 w-full overflow-hidden">
-        <img  src={d.image} alt={d.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        <img src={d.image} alt={d.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
         <span className="absolute left-3 top-3 rounded bg-primary px-2 py-1 text-xs font-medium text-white">Featured</span>
         <button
           aria-label="Save to favourites"
@@ -864,12 +864,11 @@ function ResultCard({ d, favs, onFav }) {
           )}
         </div>
         <div className="mt-4 flex items-center justify-between">
-          <Link href={"/daycares/new-page"}>
+          <Link href={"/daycares/sunshine-montessori-and-daycare"}>
             <button className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary">
               View details
             </button>
           </Link>
-
         </div>
       </div>
     </article>

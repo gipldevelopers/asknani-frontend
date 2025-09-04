@@ -5,6 +5,7 @@ import CitiesSection from "./CitiesSection";
 import DaycareListings from "./DaycareListings";
 import FeaturedDaycares from "./FeaturedDaycares";
 import HeroBanner from "./HeroBanner";
+import WhyChooseUsSection from "./WhyChooseUsSection";
 
 export default function Home_section() {
     return (
@@ -15,6 +16,7 @@ export default function Home_section() {
             <FeaturedDaycares />
             <CategorySlider />
             <BrandSections />
+            <WhyChooseUsSection/>
        </>
     );
 }

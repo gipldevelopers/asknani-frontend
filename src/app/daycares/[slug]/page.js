@@ -19,6 +19,7 @@ import {
     Share2,
     ArrowUpRight,
 } from "lucide-react";
+import Link from "next/link";
 
 // --------------------------- Sample data (replace with API) ---------------------------
 const sampleDaycare = {
@@ -333,8 +334,10 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
 
                             <div className="mt-3 space-y-2">
                                 <button className="w-full rounded-lg bg-primary px-4 py-2 text-white">Request a Visit</button>
-                                <button className="w-full rounded-lg border border-gray-200 px-4 py-2">Message Daycare</button>
-                                <a className="block text-center text-sm text-gray-600 mt-1" href={`tel:${daycare.phone}`}><Phone className="inline h-4 w-4 mr-1" /> Call</a>
+                               <Link href={"/chats/daycare/1"}> 
+                                <button className="w-full cursor-pointer rounded-lg border border-gray-200 px-4 py-2">Message Daycare</button>
+                               </Link>
+                                {/* <a className="block text-center text-sm text-gray-600 mt-1" href={`tel:${daycare.phone}`}><Phone className="inline h-4 w-4 mr-1" /> Call</a> */}
                             </div>
                         </div>
 

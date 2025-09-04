@@ -290,7 +290,7 @@ export default function DaycareListings() {
 
         {filteredDaycares.length > 0 && (
           <div className="text-center mt-10">
-            <button className="px-6 py-3 border border-indigo-600 text-primary rounded-full hover:bg-indigo-50 transition-colors font-medium">
+            <button className="px-6 py-3 border border-primary text-primary rounded-full hover:bg-indigo-50 transition-colors font-medium">
               Load More Daycares
             </button>
           </div>

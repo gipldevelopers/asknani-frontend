@@ -92,21 +92,21 @@ export default function CitiesSection() {
                                 key={index}
                                 className="min-w-[220px] sm:min-w-[260px] relative snap-center rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer group cursor-pointer"
                             >
-                             
-                                    <img
-                                        src={city.image}
-                                        alt={city.name}
-                                        className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                                    />
-                                       <Link href={`/daycares?city=${city.name}`} className="absolute inset-0 z-10" >
+
+                                <img
+                                    src={city.image}
+                                    alt={city.name}
+                                    className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                                <Link href={`/daycares?city=${city.name}`} className="absolute inset-0 z-10" >
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                                         <div className="p-4 text-white">
                                             <h3 className="text-lg font-bold">{city.name}</h3>
                                             <p className="text-sm">{city.count}</p>
                                         </div>
                                     </div>
-                                        </Link>
-                            
+                                </Link>
+
                             </div>
                         ))}
                     </div>
@@ -122,9 +122,11 @@ export default function CitiesSection() {
 
                 {/* CTA */}
                 <div className="text-center mt-8">
-                    <button className="px-6 py-3 bg-primary text-white rounded-full shadow hover:bg-primary transition">
-                        View All Cities
-                    </button>
+                    <Link href={"/daycares"}>
+                        <button className="px-6 py-3 bg-primary text-white rounded-full shadow hover:bg-primary transition">
+                            View All Cities
+                        </button>
+                    </Link>
                 </div>
             </div>
 
@@ -138,6 +140,6 @@ export default function CitiesSection() {
           scrollbar-width: none;
         }
       `}</style>
-        </section>
+        </section >
     );
 }

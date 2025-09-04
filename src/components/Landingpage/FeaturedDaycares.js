@@ -1,51 +1,51 @@
 // components/FeaturedDaycares.js
 export default function FeaturedDaycares() {
-const featuredDaycares = [
-  {
-    id: 1,
-    name: "Little Blossoms Preschool",
-    rating: 4.9,
-    reviewCount: 156,
-    price: "₹1,500/day",
-    location: "Mumbai, Maharashtra",
-    image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
-    badge: "Premium",
-  },
-  {
-    id: 2,
-    name: "Bright Future Kids Academy",
-    rating: 4.8,
-    reviewCount: 132,
-    price: "₹1,200/day",
-    location: "Bengaluru, Karnataka",
-    image:
-      "https://images.unsplash.com/photo-1503457574462-bd27054394c1?auto=format&fit=crop&w=1170&q=80",
-    badge: "Featured",
-  },
-  {
-    id: 3,
-    name: "Happy Hearts Play School",
-    rating: 4.7,
-    reviewCount: 98,
-    price: "₹1,000/day",
-    location: "Delhi, NCR",
-    image:
-      "https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&w=1170&q=80",
-    badge: "Trusted",
-  },
-  // {
-  //   id: 4,
-  //   name: "Sunshine Kids World",
-  //   rating: 4.6,
-  //   reviewCount: 87,
-  //   price: "₹1,100/day",
-  //   location: "Hyderabad, Telangana",
-  //   image:
-  //     "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
-  //   badge: "Top Rated",
-  // },
-];
+  const featuredDaycares = [
+    {
+      id: 1,
+      name: "Little Blossoms Preschool",
+      rating: 4.9,
+      reviewCount: 156,
+      price: "₹1,500/day",
+      location: "Mumbai, Maharashtra",
+      image:
+        "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      badge: "Premium",
+    },
+    {
+      id: 2,
+      name: "Bright Future Kids Academy",
+      rating: 4.8,
+      reviewCount: 132,
+      price: "₹1,200/day",
+      location: "Bengaluru, Karnataka",
+      image:
+        "https://images.unsplash.com/photo-1503457574462-bd27054394c1?auto=format&fit=crop&w=1170&q=80",
+      badge: "Featured",
+    },
+    {
+      id: 3,
+      name: "Happy Hearts Play School",
+      rating: 4.7,
+      reviewCount: 98,
+      price: "₹1,000/day",
+      location: "Delhi, NCR",
+      image:
+        "https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&w=1170&q=80",
+      badge: "Trusted",
+    },
+    // {
+    //   id: 4,
+    //   name: "Sunshine Kids World",
+    //   rating: 4.6,
+    //   reviewCount: 87,
+    //   price: "₹1,100/day",
+    //   location: "Hyderabad, Telangana",
+    //   image:
+    //     "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+    //   badge: "Top Rated",
+    // },
+  ];
 
   return (
     <section className="py-16 bg-gradient-to-b from-indigo-50 to-white">
