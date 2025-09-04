@@ -45,7 +45,7 @@ export default function AuthForms({ mode = 'login' }) {
               <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Baby className="h-10 w-10" />
               </div>
-              <h1 className="text-3xl font-bold mb-2">CareFinder</h1>
+              <h1 className="text-3xl font-bold mb-2">Ask Nani</h1>
               <p className="opacity-90">Find the perfect daycare for your little ones</p>
             </div>
 
@@ -71,7 +71,7 @@ export default function AuthForms({ mode = 'login' }) {
             </div>
 
             <div className="mt-8 bg-white/10 rounded-lg p-4">
-              <p className="text-sm italic">"Found the perfect daycare for my toddler within days of using CareFinder!"</p>
+              <p className="text-sm italic">"Found the perfect daycare for my toddler within days of using askNani!"</p>
               <p className="text-sm font-medium mt-2">- Priya S., Mumbai</p>
             </div>
           </div>

@@ -10,7 +10,7 @@ export default function Testimonials() {
             name: "Anita Patel",
             rating: 5,
             feedback:
-                "I found the perfect preschool for my son in Mumbai. The process was so simple and transparent. Highly recommend CareFinder!",
+                "I found the perfect preschool for my son in Mumbai. The process was so simple and transparent. Highly recommend askNani!",
         },
         {
             id: 2,
@@ -72,7 +72,7 @@ export default function Testimonials() {
                     </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                         Hear from parents who found their perfect daycare
-                        through CareFinder
+                        through askNani
                     </p>
                 </div>
 

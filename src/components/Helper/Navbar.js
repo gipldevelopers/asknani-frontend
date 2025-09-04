@@ -88,7 +88,7 @@ export default function Navbar() {
               </div>
             ) : (
               <Link
-                href="/get-started"
+                href="/signup"
                 className="px-6 py-2.5 bg-primary text-white font-medium rounded-full shadow hover:shadow-md hover:bg-primary/90 transition"
               >
                 Get Started

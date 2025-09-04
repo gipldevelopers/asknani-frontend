@@ -9,7 +9,7 @@ export default function BrandSections() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              How CareFinder Works
+              How askNani Works
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Finding the perfect daycare for your child has never been easier
@@ -115,7 +115,7 @@ export default function BrandSections() {
             Ready to Find Your Perfect Daycare?
           </h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Join thousands of parents who have found quality childcare through CareFinder
+            Join thousands of parents who have found quality childcare through askNani
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <button className="px-8 py-3 bg-white text-primary rounded-lg font-bold hover:bg-gray-100 transition-colors">
