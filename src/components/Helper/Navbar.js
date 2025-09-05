@@ -22,7 +22,7 @@ export default function Navbar() {
   const [unreadCount, setUnreadCount] = useState(3); // demo
 
 
-  const isLoggedIn = false; // replace later with real auth state
+  const isLoggedIn = true; // replace later with real auth state
   const cityDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
 
@@ -147,21 +147,21 @@ export default function Navbar() {
             </button>
 
             {/* Chat Icon with Count */}
-              {isLoggedIn ? (
-            <div className="relative">
-              <Link
-                href="/chats"
-                className="p-2 text-gray-500 hover:text-indigo-600 relative"
-              >
-                <MessageCircle size={24} />
-                {unreadCount > 0 && (
-                  <span className="absolute mt-7 -top-1 -right-1 bg-red-500 text-white text-xs font-medium px-1.5 py-0.5 rounded-full shadow">
-                    {unreadCount}
-                  </span>
-                )}
-              </Link>
-            </div>
-              ): null}
+            {isLoggedIn ? (
+              <div className="relative">
+                <Link
+                  href="/chats"
+                  className="p-2 text-gray-500 hover:text-indigo-600 relative"
+                >
+                  <MessageCircle size={24} />
+                  {unreadCount > 0 && (
+                    <span className="absolute mt-7 -top-1 -right-1 bg-red-500 text-white text-xs font-medium px-1.5 py-0.5 rounded-full shadow">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Link>
+              </div>
+            ) : null}
 
             {/* Profile / Auth */}
             <div className="hidden md:flex items-center space-x-4">
@@ -181,7 +181,7 @@ export default function Navbar() {
                     />
                   </button>
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-200">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-[111111]  border border-gray-200">
                       <Link
                         href="/profile"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
@@ -189,7 +189,7 @@ export default function Navbar() {
                         My Profile
                       </Link>
                       <Link
-                        href="/bookings"
+                        href="/profile/my-bookings"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-50"
                       >
                         My Bookings
@@ -248,7 +248,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 space-y-2">
+          <div className="md:hidden py-4 border-t border-gray-200 space-y-2 ">
             {!isLoggedIn ? (
               <>
                 <Link
@@ -273,7 +273,7 @@ export default function Navbar() {
                   My Profile
                 </Link>
                 <Link
-                  href="/bookings"
+                  href="/profile/my-bookings"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
                 >
                   My Bookings

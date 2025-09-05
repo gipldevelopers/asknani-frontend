@@ -190,9 +190,7 @@ export default function ChatInterface() {
                             placeholder="Type a message..."
                             className="w-full py-3 pl-4 pr-10 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/30"
                         />
-                        <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <Smile className="h-5 w-5 text-gray-500" />
-                        </button>
+
                     </div>
                     <div className="ml-2 flex">
                         {newMessage ? (
@@ -202,11 +200,7 @@ export default function ChatInterface() {
                             >
                                 <Send className="h-5 w-5 text-white" />
                             </button>
-                        ) : (
-                            <button className="p-3 rounded-full hover:bg-gray-100">
-                                <Mic className="h-5 w-5 text-gray-500" />
-                            </button>
-                        )}
+                        ) : (null)}
                     </div>
                 </div>
             </div>

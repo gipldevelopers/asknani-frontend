@@ -123,26 +123,30 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* top hero */}
-            <header className="bg-white border-gray-200 border-b">
-                <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-                    <div>
-                        <h1 className="text-lg font-semibold">{daycare.name}</h1>
-                        <p className="text-sm text-gray-600">{daycare.shortDesc}</p>
-                        <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+            {/* top hero */}
+            <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+                <div className="max-w-4xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    {/* Left content */}
+                    <div className="flex-1">
+                        <h1 className="text-base sm:text-lg font-semibold truncate">{daycare.name}</h1>
+                        <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{daycare.shortDesc}</p>
+
+                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
                             <div className="flex items-center gap-1">
                                 <Star className="h-4 w-4 text-amber-400" />
                                 <span className="font-medium">{daycare.rating.toFixed(1)}</span>
                                 <span>({daycare.reviewCount})</span>
                             </div>
-                            <div className="flex items-center gap-1">•</div>
+                            <span className="hidden sm:inline">•</span>
                             <div className="flex items-center gap-1">
                                 <MapPin className="h-4 w-4" />
-                                <span>{daycare.location}</span>
+                                <span className="truncate">{daycare.location}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    {/* Right content */}
+                    <div className="flex items-center gap-2 shrink-0">
                         <button
                             onClick={() => setFaved((s) => !s)}
                             className={`rounded-full border p-2 ${faved ? "text-red-500" : "text-gray-600"}`}
@@ -150,9 +154,13 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                         >
                             <Heart className="h-5 w-5" />
                         </button>
-                        <button className="rounded-lg bg-primary px-3 py-2 text-sm text-white" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-                            Book a Visit
-                        </button>
+                        <Link href={"#packages"} >
+                            <button
+                                className="rounded-lg bg-primary px-3 py-2 text-xs sm:text-sm text-white whitespace-nowrap cursor-pointer"
+                            >
+                                Book a Visit
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </header>
@@ -212,9 +220,9 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
 
                     {/* Staff */}
                     <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between"  >
                             <h3 className="text-base font-semibold">Meet the team</h3>
-                            <button className="text-sm text-primary">View all</button>
+                            <button className="text-sm text-primary" id="packages">View all</button>
                         </div>
                         <div className="mt-3 grid grid-cols-2 gap-3">
                             {daycare.staff.map((s) => (
@@ -231,7 +239,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                     </div>
 
                     {/* Pricing & packages */}
-                    <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100">
+                    <div className="rounded-2xl bg-white p-4 shadow-sm border border-gray-100" >
                         <div className="flex items-center justify-between">
                             <h3 className="text-base font-semibold">Pricing & packages</h3>
                             <div className="text-sm text-gray-600">Starting from <span className="font-semibold">{currency(daycare.priceFrom)}</span></div>
@@ -333,10 +341,10 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                             </div>
 
                             <div className="mt-3 space-y-2">
-                                <button className="w-full rounded-lg bg-primary px-4 py-2 text-white">Request a Visit</button>
-                               <Link href={"/chats/daycare/1"}> 
-                                <button className="w-full cursor-pointer rounded-lg border border-gray-200 px-4 py-2">Message Daycare</button>
-                               </Link>
+                                <button className="w-full rounded-lg bg-primary px-4 py-2 text-white cursor-pointer">Request a Visit</button>
+                                <Link href={"/chats/daycare/1"}>
+                                    <button className="w-full cursor-pointer rounded-lg border border-gray-200 px-4 py-2">Message Daycare</button>
+                                </Link>
                                 {/* <a className="block text-center text-sm text-gray-600 mt-1" href={`tel:${daycare.phone}`}><Phone className="inline h-4 w-4 mr-1" /> Call</a> */}
                             </div>
                         </div>

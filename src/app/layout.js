@@ -1,6 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Layout from "@/components/Helper/Layout";
+
 
 // Import Poppins
 const poppins = Poppins({
@@ -20,9 +20,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${poppins.variable} antialiased`}
       >
-        <Layout>
-          {children}
-        </Layout>
+
+        {children}
+
       </body>
     </html>
   );
