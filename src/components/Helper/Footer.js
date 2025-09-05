@@ -236,7 +236,7 @@ export default function Footer() {
         {/* Bottom section */}
         <div className="pt-8 mt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            &copy; 2023 askNani. All rights reserved.
+            &copy; 2025 asknani.com | All rights reserved.
           </p>
 
           <div className="flex space-x-6 mt-4 md:mt-0">
