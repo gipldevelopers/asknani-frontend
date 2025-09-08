@@ -4,12 +4,15 @@ import {
     Home,
     Calendar,
     Users,
-    DollarSign,
+
     MessageSquare,
     Star,
     Settings,
     Menu,
-    Bell
+    Bell,
+    IndianRupee,
+    Package,
+    CircleFadingPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItems from "./components/utils/NavItems";
@@ -26,8 +29,10 @@ export default function ProviderDashboardLayout({ children }) {
         { name: "Dashboard", href: "/providers/dashboard", icon: Home },
         { name: "Bookings", href: "/providers/bookings", icon: Calendar, count: 3, hasUnread: true },
         { name: "Children", href: "/providers/childrens", icon: Users },
-        { name: "Payments", href: "#", icon: DollarSign },
-        { name: "Messages", href: "#", icon: MessageSquare },
+        { name: "Payments", href: "/providers/payments", icon: IndianRupee },
+        { name: "Packages", href: "/providers/packages", icon: Package },
+        { name: "Contents", href: "/providers/contents", icon: CircleFadingPlus },
+        { name: "Messages", href: "/providers/messages", icon: MessageSquare },
         { name: "Reviews", href: "#", icon: Star, count: 2, hasUnread: true },
         { name: "Settings", href: "#", icon: Settings },
     ];
