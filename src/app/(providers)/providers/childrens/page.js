@@ -22,6 +22,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import Image from "next/image";
 
 export default function ChildrenManagementPage() {
     const [activeTab, setActiveTab] = useState("all");
@@ -206,7 +207,9 @@ export default function ChildrenManagementPage() {
                             <div className="flex flex-col lg:flex-row gap-6">
                                 {/* Child Photo and Basic Info */}
                                 <div className="flex items-start space-x-4">
-                                    <img
+                                    <Image
+                                        width={64}
+                                        height={64}
                                         src={child.photo}
                                         alt={child.name}
                                         className="h-16 w-16 rounded-lg object-cover"
@@ -219,7 +222,7 @@ export default function ChildrenManagementPage() {
                                             </Badge>
                                         </div>
                                         <p className="text-sm text-gray-600">
-                                            {child.age} • {child.parent}'s child
+                                            {child.age} • {child.parent}&apos;s child
                                         </p>
                                         <p className="text-sm text-gray-600">DOB: {child.dob}</p>
                                     </div>

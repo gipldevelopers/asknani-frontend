@@ -44,7 +44,7 @@ export default function DashboardOverview() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, Rajesh! Here's what's happening today.</p>
+          <p className="text-gray-600">Welcome back, Rajesh! Here&apos;s what&apos;s happening today.</p>
         </div>
         <Button>New Booking</Button>
       </div>

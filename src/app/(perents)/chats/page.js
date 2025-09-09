@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Search, Filter, ChevronLeft, MoreHorizontal, MessageSquare } from "lucide-react";
 import ChatListItem from "@/components/chat/ChatListItem";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ChatsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,8 +105,8 @@ export default function ChatsPage() {
                   setActiveFilter(activeFilter === "unread" ? "all" : "unread")
                 }
                 className={`px-3 py-2 rounded-lg flex items-center transition ${activeFilter === "unread"
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-primary text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
               >
                 <Filter className="h-4 w-4" />
@@ -149,7 +150,9 @@ export default function ChatsPage() {
       <section className="hidden md:flex flex-1 items-center justify-center">
         {activeChat ? (
           <div className="flex flex-col items-center justify-center text-center p-6 max-w-lg">
-            <img
+            <Image
+              width={20}
+              height={20}
               src={activeChat.avatar}
               alt={activeChat.daycareName}
               className="w-20 h-20 rounded-full mb-4 ring-4 ring-primary/10"

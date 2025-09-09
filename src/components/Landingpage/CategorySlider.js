@@ -117,7 +117,7 @@ const CategorySlider = () => {
             Browse by Category
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Find the perfect daycare program that matches your child's age and needs
+            Find the perfect daycare program that matches your child&apos;s age and needs
           </p>
         </div>
 

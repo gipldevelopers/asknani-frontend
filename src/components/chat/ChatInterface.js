@@ -2,6 +2,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Send, Paperclip, Mic, Smile, ArrowLeft, Video, Phone, MoreVertical, Search, Clock, MapPin } from "lucide-react";
+import Image from "next/image";
 
 export default function ChatInterface() {
     const [messages, setMessages] = useState([
@@ -107,7 +108,9 @@ export default function ChatInterface() {
                         <ArrowLeft className="h-5 w-5 text-gray-600" />
                     </button>
                     <div className="flex items-center">
-                        <img
+                        <Image
+                            width={40}
+                            height={40}
                             src={daycareInfo.avatar}
                             alt={daycareInfo.name}
                             className="h-10 w-10 rounded-full object-cover"
@@ -116,7 +119,7 @@ export default function ChatInterface() {
                             <h3 className="font-semibold text-gray-900">{daycareInfo.name}</h3>
                             <p className="text-xs text-gray-500 flex items-center">
                                 <Clock className="h-3 w-3 mr-1" />
-                                Last seen {daycareInfo.lastSeen}
+                                Last  seen {daycareInfo.lastSeen}
                             </p>
                         </div>
                     </div>

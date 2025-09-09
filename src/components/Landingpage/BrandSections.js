@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Testimonials from "./Testimonials";
+import Image from "next/image";
 
 // components/BrandSections.js
 export default function BrandSections() {
@@ -60,7 +61,7 @@ export default function BrandSections() {
                 Safety & Verification Standards
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                We rigorously verify every daycare provider on our platform to ensure your child's safety and your peace of mind.
+                We rigorously verify every daycare provider on our platform to ensure your child&apos;s safety and your peace of mind.
               </p>
 
               <div className="space-y-4">
@@ -97,7 +98,8 @@ export default function BrandSections() {
             </div>
 
             <div>
-              <img
+              <Image
+                fill
                 src="https://placehold.co/400x400/EEE/31343C?font=montserrat&text=Owner%20Photo"
                 alt="Child safety in daycare"
                 className="rounded-xl shadow-lg"

@@ -2,6 +2,7 @@
 "use client";
 import { useState } from "react";
 import { Search, Calendar, MapPin, Clock, CheckCircle, XCircle, ClockIcon, AlertCircle, ChevronDown } from "lucide-react";
+import Image from "next/image";
 
 export default function MyBookingsPage() {
     const [activeTab, setActiveTab] = useState("upcoming");
@@ -204,7 +205,9 @@ export default function MyBookingsPage() {
                                     <div className="p-6">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-start space-x-4">
-                                                <img
+                                                <Image
+                                                    width={16}
+                                                    height={16}
                                                     src={booking.image}
                                                     alt={booking.daycareName}
                                                     className="h-16 w-16 rounded-lg object-cover"

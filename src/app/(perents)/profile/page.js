@@ -2,6 +2,8 @@
 "use client";
 import { useState } from "react";
 import { Edit3, Camera, Save, X, User, Phone, Mail, MapPin, Calendar, Shield, Bell, CreditCard, FileText, Heart, LogOut, ChevronRight, CheckCircle, XCircle, Clock } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function ParentProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
@@ -195,7 +197,9 @@ export default function ParentProfilePage() {
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <div className="flex flex-col items-center">
                                 <div className="relative mb-4">
-                                    <img
+                                    <Image
+                                        width={32}
+                                        height={32}
                                         src={parentData.profileImage}
                                         alt={parentData.name}
                                         className="h-32 w-32 rounded-full object-cover border-4 border-white shadow-lg"
@@ -403,7 +407,9 @@ export default function ParentProfilePage() {
                                     <div className="space-y-6">
                                         {children.map((child) => (
                                             <div key={child.id} className="flex items-start p-4 border border-gray-200 rounded-lg">
-                                                <img
+                                                <Image
+                                                    width={16}
+                                                    height={16}
                                                     src={child.photo}
                                                     alt={child.name}
                                                     className="h-16 w-16 rounded-lg object-cover mr-4"
@@ -479,13 +485,13 @@ export default function ParentProfilePage() {
                                     My Bookings
                                 </h3>
                                 {bookings.upcoming.length > 0 && (
-                                    <a
+                                    <Link
                                         href="/profile/my-bookings"
                                         className="text-sm font-medium text-primary hover:text-primary-hover flex items-center"
                                     >
                                         View all
                                         <ChevronRight className="h-4 w-4 ml-1" />
-                                    </a>
+                                    </Link>
                                 )}
                             </div>
 
@@ -528,7 +534,9 @@ export default function ParentProfilePage() {
                                         </div>
 
                                         <div className="flex items-center">
-                                            <img
+                                            <Image
+                                                width={10}
+                                                height={10}
                                                 src={bookings.upcoming[0].image}
                                                 alt={bookings.upcoming[0].daycareName}
                                                 className="h-10 w-10 rounded-lg object-cover mr-3"
@@ -551,12 +559,12 @@ export default function ParentProfilePage() {
                                         <Calendar className="h-6 w-6 text-gray-400" />
                                     </div>
                                     <p className="text-gray-600 mb-4">No upcoming bookings</p>
-                                    <a
+                                    <Link
                                         href="/daycares"
                                         className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-hover inline-block"
                                     >
                                         Book Now
-                                    </a>
+                                    </Link>
                                 </div>
                             )}
                         </div>

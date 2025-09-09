@@ -1,21 +1,22 @@
 // components/HeroBanner.js
 "use client";
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, MapPin, Shield, Star, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Shield, Star, Clock, Search, Heart, Users, BookOpen } from "lucide-react";
+import Image from "next/image";
 
 const slides = [
   {
     img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-    alt: "Kids playing in daycare"
+    alt: "Kids playing in daycare",
   },
   {
-    img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-    alt: "Teachers with children"
+    img: "https://images.unsplash.com/photo-1567746455504-cb3213f8f5b8?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    alt: "Teachers with children",
   },
   {
-    img: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
-    alt: "Learning activities"
-  }
+    img: "https://images.unsplash.com/photo-1722247480078-4fffd0ab166f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    alt: "Learning activities",
+  },
 ];
 
 export default function HeroBanner() {
@@ -33,90 +34,133 @@ export default function HeroBanner() {
   const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative bg-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24 grid lg:grid-cols-2 gap-10 items-center">
+    <section className="relative bg-indigo-50  overflow-hidden">
+      {/* Decorative elements */}
 
-        {/* LEFT CONTENT (Static) */}
-        <div className="space-y-6">
-          <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight">
-            Find the <span className="text-primary">Perfect Daycare</span> <br />
-            for Your Child
-          </h1>
-          <p className="text-lg text-gray-600 max-w-lg">
-            Discover trusted providers across India with verified reviews, real-time availability, and easy bookings — all in one platform.
-          </p>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 xl:py-20 grid lg:grid-cols-12 gap-6 lg:gap-10 items-center relative z-10">
+        {/* LEFT: Text Content */}
+        <div className="lg:col-span-5 space-y-6 md:space-y-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium">
+              <Heart className="h-4 w-4 mr-1" /> Trusted by 10,000+ Parents
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Perfect Daycare</span> for Your Child
+            </h1>
+
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl">
+              Discover trusted providers across India with verified reviews, real-time availability, and easy bookings — all in one platform.
+            </p>
+          </div>
 
           {/* Search Bar */}
-          <div className="flex w-full max-w-lg bg-white rounded-full shadow-md overflow-hidden border border-gray-200">
-            <div className="flex items-center px-4 text-gray-500">
-              <MapPin className="h-5 w-5" />
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row w-full bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200/70">
+              <div className="flex items-center flex-grow px-4 sm:px-5">
+                <MapPin className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Enter location, daycare name..."
+                  className="flex-grow px-3 sm:px-4 py-4 text-gray-700 focus:outline-none placeholder-gray-400"
+                />
+              </div>
+              <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 font-medium hover:opacity-90 transition-all flex items-center justify-center">
+                <Search className="h-5 w-5 mr-2" />
+                <span>Search</span>
+              </button>
             </div>
-            <input
-              type="text"
-              placeholder="Enter location, daycare name..."
-              className="flex-grow px-3 py-3 text-gray-700 focus:outline-none"
-            />
-            <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 font-medium hover:opacity-90 transition-all">
-              Search
-            </button>
+
+            {/* Popular searches */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-gray-500 text-sm">Popular:</span>
+              {["Daycare near me", "Preschool", "Baby care", "After school"].map((tag, i) => (
+                <button key={i} className="text-sm text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-full transition-colors">
+                  {tag}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Trust Indicators */}
-          <div className="flex flex-wrap gap-4 pt-4">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Shield className="h-5 w-5 text-green-500" />
-              <span className="text-sm">Verified Providers</span>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+            <div className="flex items-center gap-2 text-gray-700 p-2 rounded-lg bg-white/50 backdrop-blur-sm">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Shield className="h-5 w-5 text-green-600" />
+              </div>
+              <span className="text-sm font-medium">Verified Providers</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Star className="h-5 w-5 text-yellow-500" />
-              <span className="text-sm">Parent Reviews</span>
+            <div className="flex items-center gap-2 text-gray-700 p-2 rounded-lg bg-white/50 backdrop-blur-sm">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Star className="h-5 w-5 text-yellow-600" />
+              </div>
+              <span className="text-sm font-medium">Parent Reviews</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Clock className="h-5 w-5 text-indigo-500" />
-              <span className="text-sm">Real-Time Availability</span>
+            <div className="flex items-center gap-2 text-gray-700 p-2 rounded-lg bg-white/50 backdrop-blur-sm">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Clock className="h-5 w-5 text-blue-600" />
+              </div>
+              <span className="text-sm font-medium">Real-Time Availability</span>
             </div>
           </div>
         </div>
 
-        {/* RIGHT CONTENT (Image Slider) */}
-        <div className="relative w-full h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-xl">
+        {/* RIGHT: Image Slider */}
+        <div className="lg:col-span-7 relative w-full h-[380px] sm:h-[450px] md:h-[500px] lg:h-[550px] rounded-2xl overflow-hidden shadow-2xl">
           {slides.map((slide, index) => (
-            <img
+            <div
               key={index}
-              src={slide.img}
-              alt={slide.alt}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${index === current ? "opacity-100 z-20" : "opacity-0 z-10"
-                }`}
-            />
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === current ? "opacity-100 z-20" : "opacity-0 z-10"}`}
+            >
+              <Image
+              fill
+                src={slide.img}
+                alt={slide.alt}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+            </div>
           ))}
+
+          {/* Content overlay */}
+          <div className="absolute bottom-0 left-0 right-0 text-white p-6 md:p-8 z-30 bg-gradient-to-t from-black/70 to-transparent">
+            <div className="max-w-md">
+              <h3 className="text-xl md:text-2xl font-bold mb-2">Safe & Nurturing Environments</h3>
+              <p className="text-sm md:text-base opacity-90">Our partner daycares maintain the highest standards of safety and care for your little ones.</p>
+            </div>
+          </div>
 
           {/* Controls */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-700 rounded-full p-2 shadow z-30"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg z-30 transition-all hover:scale-110"
+            aria-label="Previous slide"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-700 rounded-full p-2 shadow z-30"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg z-30 transition-all hover:scale-110"
+            aria-label="Next slide"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
 
           {/* Dots */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-30">
             {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrent(index)}
-                className={`w-3 h-3 rounded-full transition-all ${index === current ? "bg-primary scale-125" : "bg-gray-300 hover:bg-gray-400"
-                  }`}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${index === current ? "bg-white scale-125" : "bg-white/60 hover:bg-white/80"}`}
+                aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
         </div>
       </div>
+
+
     </section>
   );
 }

@@ -113,7 +113,7 @@ export default function TourScheduledPage() {
     ];
 
     setTours(sampleTours);
-    
+
     // Filter today's tours
     const today = new Date().toDateString();
     const todaysTours = sampleTours.filter(tour => {
@@ -124,12 +124,12 @@ export default function TourScheduledPage() {
   }, []);
 
   const filteredTours = tours.filter(tour => {
-    const matchesSearch = searchTerm === '' || 
+    const matchesSearch = searchTerm === '' ||
       tour.parentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tour.childName.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || tour.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -156,13 +156,13 @@ export default function TourScheduledPage() {
       'cancelled': { variant: 'destructive', text: 'Cancelled' },
       'noshow': { variant: 'outline', text: 'No Show' }
     };
-    
+
     const config = statusConfig[status] || { variant: 'outline', text: status };
     return <Badge variant={config.variant}>{config.text}</Badge>;
   };
 
   const handleStatusChange = (tourId, newStatus) => {
-    setTours(prev => prev.map(tour => 
+    setTours(prev => prev.map(tour =>
       tour.id === tourId ? { ...tour, status: newStatus } : tour
     ));
   };
@@ -200,7 +200,7 @@ export default function TourScheduledPage() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Upcoming Tours</CardTitle>
@@ -212,7 +212,7 @@ export default function TourScheduledPage() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Completed</CardTitle>
@@ -224,10 +224,10 @@ export default function TourScheduledPage() {
             </p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Today's Tours</CardTitle>
+            <CardTitle className="text-sm font-medium">Today&apos;s Tours</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.today}</div>
@@ -240,7 +240,7 @@ export default function TourScheduledPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="today">Today's Tours</TabsTrigger>
+          <TabsTrigger value="today">Today&apos;s Tours</TabsTrigger>
           <TabsTrigger value="all">All Tours</TabsTrigger>
         </TabsList>
 
@@ -294,15 +294,15 @@ export default function TourScheduledPage() {
                       Call
                     </Button>
                     <div className="flex space-x-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => handleStatusChange(tour.id, 'cancelled')}
                       >
                         <X className="h-4 w-4 mr-1" />
                         Cancel
                       </Button>
-                      <Button 
+                      <Button
                         size="sm"
                         onClick={() => handleStatusChange(tour.id, 'completed')}
                       >
@@ -320,7 +320,7 @@ export default function TourScheduledPage() {
                 <CalendarDays className="h-16 w-16 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">No tours scheduled for today</h3>
                 <p className="text-muted-foreground text-center mb-4">
-                  You don't have any facility tours scheduled for today.
+                  You don&apos;t have any facility tours scheduled for today.
                 </p>
                 <Button>
                   <CalendarDays className="h-4 w-4 mr-2" />

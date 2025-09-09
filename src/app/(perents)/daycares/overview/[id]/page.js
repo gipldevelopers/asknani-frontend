@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, Star, Clock, Phone, Mail, Globe, Users, Shield, Award, Heart } from 'lucide-react';
+import Image from 'next/image';
 
 const DaycareDetailPage = () => {
     const [activeTab, setActiveTab] = useState('overview');
@@ -138,18 +139,21 @@ Our center features state-of-the-art facilities with secure premises, CCTV monit
             {/* Image Gallery */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                 <div className="md:col-span-2 md:row-span-2">
-                    <img
+                    <Image
                         src={daycare.images[0]}
                         alt={daycare.name}
-                        className="w-full h-full object-cover rounded-lg"
+                        fill
+                        className="object-cover rounded-lg"
+                        priority
                     />
                 </div>
                 {daycare.images.slice(1, 4).map((image, index) => (
                     <div key={index}>
-                        <img
+                        <Image
                             src={image}
                             alt={daycare.name}
-                            className="w-full h-40 object-cover rounded-lg"
+                            fill
+                            className="object-cover rounded-lg"
                         />
                     </div>
                 ))}
@@ -246,7 +250,7 @@ Our center features state-of-the-art facilities with secure premises, CCTV monit
                         <CardHeader>
                             <CardTitle>Facilities & Amenities</CardTitle>
                             <CardDescription>
-                                We provide a safe and stimulating environment for your child's development
+                                We provide a safe and stimulating environment for your child&apos;s development
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -278,7 +282,8 @@ Our center features state-of-the-art facilities with secure premises, CCTV monit
                                 {daycare.staff.map((person, index) => (
                                     <Card key={index} className="text-center">
                                         <CardContent className="pt-6">
-                                            <img
+                                            <Image
+                                            fill
                                                 src={person.image}
                                                 alt={person.name}
                                                 className="w-24 h-24 rounded-full mx-auto object-cover mb-4"

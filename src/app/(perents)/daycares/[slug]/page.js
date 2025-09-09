@@ -170,7 +170,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                 <section className="lg:col-span-2 space-y-4">
                     <div className="rounded-2xl overflow-hidden bg-white shadow-sm">
                         <div className="h-64 w-full relative">
-                            <img src={selectedImage} alt="gallery" className="h-full w-full object-cover" />
+                            <Image fill src={selectedImage} alt="gallery" className="h-full w-full object-cover" />
                             <div className="absolute right-3 top-3 flex gap-2">
                                 <button className="rounded-md bg-white/90 px-2 py-1 text-xs">Virtual tour</button>
                                 <button className="rounded-md bg-white/90 px-2 py-1 text-xs">Share</button>
@@ -179,7 +179,7 @@ export default function DaycareDetailPage({ daycare = sampleDaycare }) {
                         <div className="p-3 border-t border-gray-500 overflow-x-auto flex gap-2 scrollbar-hide">
                             {daycare.images.map((img) => (
                                 <button key={img} onClick={() => setSelectedImage(img)} className="shrink-0">
-                                    <img src={img} className={`h-20 w-28 object-cover rounded-md ${selectedImage === img ? 'ring-2 ring-indigo-500' : 'ring-1 ring-gray-100'}`} />
+                                    <Image alt="image" width={28} height={20} src={img} className={`h-20 w-28 object-cover rounded-md ${selectedImage === img ? 'ring-2 ring-indigo-500' : 'ring-1 ring-gray-100'}`} />
                                 </button>
                             ))}
                         </div>

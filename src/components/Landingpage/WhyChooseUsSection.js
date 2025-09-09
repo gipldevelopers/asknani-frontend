@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, Users, TrendingUp, Shield, DollarSign, Calendar, Star, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function WhyChooseUsSection() {
     const scrollRef = useRef(null);
@@ -218,7 +219,9 @@ export default function WhyChooseUsSection() {
                                     className="min-w-[300px] md:min-w-[400px] bg-gray-50 rounded-xl p-6 snap-center shadow-md hover:shadow-lg transition-shadow"
                                 >
                                     <div className="flex items-center mb-4">
-                                        <img
+                                        <Image
+                                            width={48}
+                                            height={48}
                                             src={testimonial.avatar}
                                             alt={testimonial.name}
                                             className="h-12 w-12 rounded-full object-cover mr-4"
@@ -228,7 +231,7 @@ export default function WhyChooseUsSection() {
                                             <p className="text-sm text-gray-600">{testimonial.daycare}</p>
                                         </div>
                                     </div>
-                                    <p className="text-gray-700 italic">"{testimonial.content}"</p>
+                                    <p className="text-gray-700 italic">&quot;{testimonial.content}&quot;</p>
                                 </div>
                             ))}
                         </div>
@@ -245,10 +248,10 @@ export default function WhyChooseUsSection() {
 
                 {/* CTA */}
                 <div className="text-center mt-12">
-                            <Link href="/signup">
-                    <button className="px-8 py-3 bg-primary text-white rounded-full shadow hover:bg-primary-hover transition font-semibold">
-                        Register Your Daycare Center
-                    </button></Link>
+                    <Link href="/signup">
+                        <button className="px-8 py-3 bg-primary text-white rounded-full shadow hover:bg-primary-hover transition font-semibold">
+                            Register Your Daycare Center
+                        </button></Link>
                     <p className="text-gray-600 mt-4">Join our growing network of trusted daycare providers</p>
                 </div>
             </div>

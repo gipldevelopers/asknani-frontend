@@ -793,7 +793,7 @@ function FeaturedCard({ d, favs, onFav }) {
   return (
     <div className="group overflow-hidden rounded-xl border border-gray-200 bg-white transition hover:shadow-md">
       <div className="relative h-40 w-full overflow-hidden">
-        <img src={d.image} alt={d.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+        <Image fill src={d.image} alt={d.name} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
         <span className="absolute left-3 top-3 rounded bg-primary px-2 py-1 text-xs font-medium text-white">Featured</span>
         <button
           aria-label="Save to favourites"
@@ -825,7 +825,8 @@ function ResultCard({ d, favs, onFav }) {
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition hover:shadow-md">
       <div className="relative h-44 w-full overflow-hidden">
-        <img
+        <Image
+          fill
           src={d.image}
           alt={d.name}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
@@ -887,7 +888,7 @@ function CompactRow({ d, favs, onFav }) {
   return (
     <article className="flex items-center gap-3 p-3">
       <div className="relative h-16 w-20 overflow-hidden rounded-lg">
-        <img src={d.image} alt="" className="h-full w-full object-cover" />
+        <Image fill src={d.image} alt="" className="h-full w-full object-cover" />
         {d.isFeatured && (
           <span className="absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-white">
             Featured

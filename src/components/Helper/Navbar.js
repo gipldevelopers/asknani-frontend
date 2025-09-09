@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import { Search, MapPin, ChevronDown, Menu, X, User } from "lucide-react";
 import { MessageCircle } from "lucide-react";
 import useUIStore from "@/stores/uiStore";
+import AdBanner from "../Ads/AdBanner";
 
 
 const indianCities = [
@@ -48,6 +49,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+           <AdBanner/>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo */}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 // components/FeaturedDaycares.js
@@ -72,7 +73,8 @@ export default function FeaturedDaycares() {
             >
               {/* Image */}
               <div className="relative h-48 w-full overflow-hidden">
-                <img
+                <Image
+                  fill
                   src={daycare.image}
                   alt={daycare.name}
                   className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"

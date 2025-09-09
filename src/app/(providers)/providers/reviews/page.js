@@ -115,7 +115,7 @@ const ManageReviewsPage = () => {
       setSelectedReview(sampleReviews[0]);
       setResponseText(sampleReviews[0].daycareResponse || '');
     }
-  }, []);
+  },[selectedReview]);
 
   const filteredReviews = reviews.filter(review => {
     const matchesSearch = searchTerm === '' || 

@@ -94,7 +94,7 @@ const MessagesPage = () => {
         if (sampleContacts.length > 0 && !selectedContact) {
             setSelectedContact(sampleContacts[0]);
         }
-    }, []);
+    },[selectedContact]);
 
     const filteredContacts = contacts.filter(contact => {
         const matchesSearch = searchTerm === '' ||

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, MapPin, Filter, Star, ChevronDown, X } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const indianCities = [
   "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
@@ -230,7 +231,8 @@ export default function DaycareListings() {
               <div key={daycare.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-gray-100 flex flex-col">
                 {/* Image Section */}
                 <div className="h-48 relative overflow-hidden flex-shrink-0">
-                  <img
+                  <Image
+                    fill
                     src={daycare.image}
                     alt={daycare.name}
                     className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"

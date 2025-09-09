@@ -13,7 +13,10 @@ import {
     IndianRupee,
     Package,
     CircleFadingPlus,
-    Binoculars
+    Binoculars,
+    Activity,
+    ChartNoAxesCombined,
+    Megaphone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItems from "./components/utils/NavItems";
@@ -37,6 +40,8 @@ export default function ProviderDashboardLayout({ children }) {
         { name: "Messages", href: "/providers/messages", icon: MessageSquare },
         { name: "Tour Scheduled", href: "/providers/tour-scheduled", icon: Binoculars },
         { name: "Reviews", href: "/providers/reviews", icon: Star, count: 2, hasUnread: true },
+        { name: "Traffic", href: "/providers/traffic", icon: ChartNoAxesCombined },
+        { name: "Promotional ", href: "/providers/promotional", icon: Megaphone },
         { name: "Settings", href: "#", icon: Settings },
     ];
 

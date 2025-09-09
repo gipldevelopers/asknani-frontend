@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Paperclip, ArrowRight, Image as ImageIcon, FileText } from "lucide-react";
+import Image from "next/image";
 
 export default function MessageThreadPage() {
   const { id } = useParams(); // contact ID from URL
@@ -67,11 +68,10 @@ export default function MessageThreadPage() {
             className={`flex ${msg.type === "outgoing" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[70%] rounded-lg p-3 shadow ${
-                msg.type === "outgoing"
+              className={`max-w-[70%] rounded-lg p-3 shadow ${msg.type === "outgoing"
                   ? "bg-primary text-primary-foreground"
                   : "bg-white"
-              }`}
+                }`}
             >
               {msg.content && <p className="text-sm">{msg.content}</p>}
 
@@ -83,7 +83,8 @@ export default function MessageThreadPage() {
                     return (
                       <div key={idx} className="flex items-center gap-2 text-xs">
                         {isImage ? (
-                          <img
+                          <Image
+                            fill
                             src={URL.createObjectURL(file)}
                             alt="preview"
                             className="h-20 w-20 object-cover rounded"
@@ -100,9 +101,8 @@ export default function MessageThreadPage() {
               )}
 
               <div
-                className={`text-[10px] mt-1 ${
-                  msg.type === "outgoing" ? "text-primary-foreground/70" : "text-gray-500"
-                }`}
+                className={`text-[10px] mt-1 ${msg.type === "outgoing" ? "text-primary-foreground/70" : "text-gray-500"
+                  }`}
               >
                 {formatTime(msg.timestamp)}
               </div>
@@ -147,7 +147,8 @@ export default function MessageThreadPage() {
             return (
               <div key={idx} className="relative">
                 {isImage ? (
-                  <img
+                  <Image
+                    fill
                     src={URL.createObjectURL(file)}
                     alt="preview"
                     className="h-16 w-16 object-cover rounded"

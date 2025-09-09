@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2, Upload, MapPin, Users, Shield, Award, Wifi, Utensils, Car, Heart, BookOpen } from 'lucide-react';
+import Image from 'next/image';
 
 // Reusable Image Upload Component
 const ImageUpload = ({ images, onImagesChange, maxImages = 10 }) => {
@@ -33,7 +34,8 @@ const ImageUpload = ({ images, onImagesChange, maxImages = 10 }) => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         {images.map((image, index) => (
           <div key={index} className="relative group">
-            <img 
+            <Image
+            fill
               src={image} 
               alt={`Daycare ${index + 1}`} 
               className="h-40 w-full object-cover rounded-lg"
@@ -414,7 +416,7 @@ Our center features state-of-the-art facilities with secure premises, CCTV monit
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
               <CardDescription>
-                Update your daycare's basic information that appears in search results and listings.
+                Update your daycare&apos;s basic information that appears in search results and listings.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -622,7 +624,7 @@ Our center features state-of-the-art facilities with secure premises, CCTV monit
             <CardHeader>
               <CardTitle>Certifications & Accreditations</CardTitle>
               <CardDescription>
-                Showcase your daycare's certifications and accreditations.
+                Showcase your daycare&apos;s certifications and accreditations.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

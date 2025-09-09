@@ -107,7 +107,7 @@ export default function Testimonials() {
                                 </div>
 
                                 {/* Feedback */}
-                                <p className="text-gray-600">"{t.feedback}"</p>
+                                <p className="text-gray-600">&quot;{t.feedback}&quot;</p>
                             </div>
                         ))}
                     </div>

@@ -1,4 +1,5 @@
 import { Calendar, Clock, MapPin, CheckCircle, XCircle, ClockIcon } from "lucide-react";
+import Image from "next/image";
 
 export default function BookingCard({ booking, activeTab, onAction }) {
   const getStatusIcon = (status) => {
@@ -14,7 +15,9 @@ export default function BookingCard({ booking, activeTab, onAction }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       {/* Image */}
-      <img
+      <Image
+        width={400}
+        height={160}
         src={booking.image}
         alt={booking.daycareName}
         className="w-full h-40 object-cover"

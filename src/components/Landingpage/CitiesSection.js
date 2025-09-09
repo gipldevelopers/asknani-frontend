@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CitiesSection() {
     const scrollRef = useRef(null);
@@ -93,7 +94,9 @@ export default function CitiesSection() {
                                 className="min-w-[220px] sm:min-w-[260px] relative snap-center rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow cursor-pointer group cursor-pointer"
                             >
 
-                                <img
+                                <Image
+                                    width={260}
+                                    height={160}
                                     src={city.image}
                                     alt={city.name}
                                     className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"

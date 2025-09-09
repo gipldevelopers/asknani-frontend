@@ -71,7 +71,7 @@ export default function AuthForms({ mode = 'login' }) {
             </div>
 
             <div className="mt-8 bg-white/10 rounded-lg p-4">
-              <p className="text-sm italic">"Found the perfect daycare for my toddler within days of using askNani!"</p>
+              <p className="text-sm italic">&quot;Found the perfect daycare for my toddler within days of using askNani!&quot;</p>
               <p className="text-sm font-medium mt-2">- Priya S., Mumbai</p>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function AuthForms({ mode = 'login' }) {
                       onClick={() => setIsParent(true)}
                       className={`flex-1 py-2 rounded-lg border ${isParent ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-300'}`}
                     >
-                      I'm a Parent
+                      I&apos;m a Parent
                     </button>
                     <button
                       type="button"
