@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 // components/FeaturedDaycares.js
 export default function FeaturedDaycares() {
   const featuredDaycares = [
@@ -115,9 +117,11 @@ export default function FeaturedDaycares() {
                 </p>
 
                 {/* Button */}
-                <button className="mt-auto w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:primary-hover transition-colors shadow">
-                  Book a Tour
-                </button>
+                <Link href={`/daycares/${daycare.id}`}>
+                  <button className="mt-auto w-full bg-primary text-white py-2.5 rounded-lg font-medium hover:primary-hover transition-colors shadow">
+                    Book a Tour
+                  </button>
+                </Link>
               </div>
             </div>
           ))}

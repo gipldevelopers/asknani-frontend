@@ -12,6 +12,7 @@ const poppins = Poppins({
 export const metadata = {
   title: "Day Care Marketplace",
   description: "A marketplace for daycare services",
+
 };
 
 export default function RootLayout({ children }) {

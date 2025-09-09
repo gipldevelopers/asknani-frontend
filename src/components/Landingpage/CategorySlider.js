@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Baby, Users, GraduationCap, Heart, Clock, Utensils, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 const categories = [
   {
     icon: Baby,
@@ -72,9 +72,17 @@ const categories = [
 ];
 
 const CategorySlider = () => {
+  const { push } = useRouter();
+
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const sliderRef = useRef(null);
+
+  //on click redirect 
+  const handleCategoryClick = (category) => {
+    push(`/daycares?categories=${category.title}`);
+  }
 
   // Auto-scroll functionality
   useEffect(() => {
@@ -142,7 +150,8 @@ const CategorySlider = () => {
             {categories.map((category, index) => {
               const IconComponent = category.icon;
               return (
-                <div key={index} className="flex-shrink-0 w-1/4 px-3">
+                <div key={index} className="flex-shrink-0 w-1/4 px-3" onClick={() => handleCategoryClick(category)}>
+
                   <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 group hover:-translate-y-2 cursor-pointer border border-gray-100">
                     <div className="flex flex-col items-center text-center">
 

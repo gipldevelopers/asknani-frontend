@@ -89,7 +89,7 @@ export default function BookingsManagement() {
                 <Filter className="h-4 w-4" />
                 Filter
               </Button>
-              <Button variant="outline">Export</Button>
+              {/* <Button variant="outline">Export</Button> */}
             </div>
           </div>
 
@@ -148,7 +148,7 @@ export default function BookingsManagement() {
                     <p className="font-semibold text-lg">₹{booking.price}</p>
                     <p className="text-sm text-gray-600">Full day</p>
                   </div>
-                  
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon">

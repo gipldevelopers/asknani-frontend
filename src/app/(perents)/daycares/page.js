@@ -42,6 +42,14 @@ const categories = [
   "Security Cameras",
   "Music Classes",
   "Organic Meals",
+  "Weekend Care",
+  "Drop-in Care",
+  "Infant Care",
+  "Toddler Care",
+  "Preschool",
+  "Special Needs",
+  "Extended Hours",
+
 ];
 
 const daycares = [

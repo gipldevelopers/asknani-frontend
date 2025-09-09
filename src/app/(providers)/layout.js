@@ -12,7 +12,8 @@ import {
     Bell,
     IndianRupee,
     Package,
-    CircleFadingPlus
+    CircleFadingPlus,
+    Binoculars
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItems from "./components/utils/NavItems";
@@ -20,6 +21,7 @@ import { MobileNav } from "./components/utils/MobileNav";
 import Logo from "./components/utils/Logo";
 import { ProfilePopover } from "./components/utils/Profile";
 import { NotificationPopover } from "./components/utils/Notifications";
+import ProviderFooter from "./components/utils/Footer";
 
 
 export default function ProviderDashboardLayout({ children }) {
@@ -33,7 +35,8 @@ export default function ProviderDashboardLayout({ children }) {
         { name: "Packages", href: "/providers/packages", icon: Package },
         { name: "Contents", href: "/providers/contents", icon: CircleFadingPlus },
         { name: "Messages", href: "/providers/messages", icon: MessageSquare },
-        { name: "Reviews", href: "#", icon: Star, count: 2, hasUnread: true },
+        { name: "Tour Scheduled", href: "/providers/tour-scheduled", icon: Binoculars },
+        { name: "Reviews", href: "/providers/reviews", icon: Star, count: 2, hasUnread: true },
         { name: "Settings", href: "#", icon: Settings },
     ];
 
@@ -77,6 +80,7 @@ export default function ProviderDashboardLayout({ children }) {
                         {children}
                     </div>
                 </main>
+                <ProviderFooter/>
             </div>
         </div>
     );

@@ -2,6 +2,7 @@
 "use client";
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, Users, TrendingUp, Shield, DollarSign, Calendar, Star, MessageCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function WhyChooseUsSection() {
     const scrollRef = useRef(null);
@@ -244,9 +245,10 @@ export default function WhyChooseUsSection() {
 
                 {/* CTA */}
                 <div className="text-center mt-12">
+                            <Link href="/signup">
                     <button className="px-8 py-3 bg-primary text-white rounded-full shadow hover:bg-primary-hover transition font-semibold">
                         Register Your Daycare Center
-                    </button>
+                    </button></Link>
                     <p className="text-gray-600 mt-4">Join our growing network of trusted daycare providers</p>
                 </div>
             </div>

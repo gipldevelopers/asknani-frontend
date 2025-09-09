@@ -2,6 +2,7 @@
 "use client";
 import { useState, useRef, useEffect } from 'react';
 import { Search, MapPin, Filter, Star, ChevronDown, X } from 'lucide-react';
+import Link from 'next/link';
 
 const indianCities = [
   "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
@@ -271,9 +272,12 @@ export default function DaycareListings() {
 
                 {/* Sticky Button at Bottom */}
                 <div className="p-4 pt-0 mt-auto sticky bottom-0 bg-white border-t border-gray-100">
-                  <button className="w-full bg-primary text-white py-2.5 rounded-lg hover:bg-primary transition-colors font-medium text-sm shadow-md">
-                    View Details
-                  </button>
+                  <Link href={`/daycares/${daycare.id}`}>
+
+                    <button className="w-full bg-primary text-white py-2.5 rounded-lg hover:bg-primary transition-colors font-medium text-sm shadow-md">
+                      View Details
+                    </button>
+                  </Link>
                 </div>
               </div>
             ))}
