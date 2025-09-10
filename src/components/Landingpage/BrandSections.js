@@ -102,7 +102,7 @@ export default function BrandSections() {
                 unoptimized
                 width={400}
                 height={400}
-                src="https://placehold.co/400x400/EEE/31343C?font=montserrat&text=Owner%20Photo"
+                src="./photo.jpg"
                 alt="Child safety in daycare"
                 className="rounded-xl shadow-lg"
               />

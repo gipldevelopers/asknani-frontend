@@ -16,7 +16,7 @@ export default function FeaturedDaycares() {
       price: "₹1,500/day",
       location: "Mumbai, Maharashtra",
       image:
-        "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1503457574462-bd27054394c1?auto=format&fit=crop&w=1170&q=80",
       badge: "Premium",
     },
     {
@@ -49,7 +49,7 @@ export default function FeaturedDaycares() {
       price: "₹1,100/day",
       location: "Hyderabad, Telangana",
       image:
-        "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1503457574462-bd27054394c1?auto=format&fit=crop&w=1170&q=80",
       badge: "Top Rated",
     },
   ];

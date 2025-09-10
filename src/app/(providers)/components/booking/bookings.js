@@ -12,10 +12,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 
 export default function BookingsManagement() {
   const [statusFilter, setStatusFilter] = useState("all");
-
+  const router = useRouter();
   const bookings = [
     {
       id: 1,
@@ -69,7 +72,9 @@ export default function BookingsManagement() {
           <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
           <p className="text-gray-600">Manage all your daycare bookings</p>
         </div>
-        <Button>New Booking</Button>
+        <Link href={"/providers/bookings/new"}>
+          <Button>New Booking</Button>
+        </Link>
       </div>
 
       {/* Filters */}
@@ -156,8 +161,8 @@ export default function BookingsManagement() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Edit Booking</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => router.push(`/providers/bookings/details/${123}`)}>View Details</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => router.push(`/providers/bookings/edit/${123}`)}>Edit Booking</DropdownMenuItem>
                       <DropdownMenuItem>Send Message</DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600">
                         Cancel Booking

@@ -61,7 +61,7 @@ const daycares = [
     price: "₹800/day",
     location: "Bandra, Mumbai",
     image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["Playground", "Educational Programs", "Meals Included"],
     city: "Mumbai",
     isFeatured: true,
@@ -75,7 +75,7 @@ const daycares = [
     price: "₹950/day",
     location: "Whitefield, Bangalore",
     image:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1176&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["STEM Curriculum", "Outdoor Activities", "Flexible Hours"],
     city: "Bangalore",
     isFeatured: true,
@@ -89,7 +89,7 @@ const daycares = [
     price: "₹700/day",
     location: "Saket, Delhi",
     image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["Arts & Crafts", "Nap Rooms", "Security Cameras"],
     city: "Delhi",
     isFeatured: false,
@@ -103,7 +103,7 @@ const daycares = [
     price: "₹850/day",
     location: "Gachibowli, Hyderabad",
     image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["Multilingual Staff", "Music Classes", "Organic Meals"],
     city: "Hyderabad",
     isFeatured: true,
@@ -131,7 +131,7 @@ const daycares = [
     price: "₹900/day",
     location: "Salt Lake, Kolkata",
     image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["Indoor Play Area", "Learning Toys", "Trained Staff"],
     city: "Kolkata",
     isFeatured: true,
@@ -145,7 +145,7 @@ const daycares = [
     price: "₹820/day",
     location: "Koregaon Park, Pune",
     image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["Creative Activities", "Safe Transport", "Regular Updates"],
     city: "Pune",
     isFeatured: false,
@@ -173,7 +173,7 @@ const daycares = [
     price: "₹720/day",
     location: "MG Road, Bangalore",
     image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["Storytelling", "Dance Classes", "Healthy Snacks"],
     city: "Bangalore",
     isFeatured: false,
@@ -187,7 +187,7 @@ const daycares = [
     price: "₹920/day",
     location: "Andheri, Mumbai",
     image:
-      "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      "https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=1160&q=80",
     features: ["Early Learning", "Play-based Curriculum", "Parent App"],
     city: "Mumbai",
     isFeatured: true,

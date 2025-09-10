@@ -1,4 +1,4 @@
-import BookingsManagement from "../../components/bookings";
+import BookingsManagement from "../../components/booking/bookings";
 
 
 export default function ProviderBookingsPage() {
