@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, MapPin, Filter, Star, ChevronDown, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const indianCities = [
   "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
@@ -102,6 +103,7 @@ const daycares = [
 ];
 
 export default function DaycareListings() {
+  const router = useRouter();
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All Cities');
@@ -228,7 +230,7 @@ export default function DaycareListings() {
         {filteredDaycares.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredDaycares.map(daycare => (
-              <div key={daycare.id} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-gray-100 flex flex-col">
+              <div key={daycare.id} onClick={() => router.push(`/daycares/${daycare.id}`)} className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow border border-gray-100 flex flex-col cursor-pointer">
                 {/* Image Section */}
                 <div className="h-48 relative overflow-hidden flex-shrink-0">
                   <Image

@@ -1,8 +1,12 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+
 // components/FeaturedDaycares.js
 export default function FeaturedDaycares() {
+  const router = useRouter();
   const featuredDaycares = [
     {
       id: 1,
@@ -37,17 +41,17 @@ export default function FeaturedDaycares() {
         "https://images.unsplash.com/photo-1596464716127-f2a82984de30?auto=format&fit=crop&w=1170&q=80",
       badge: "Trusted",
     },
-    // {
-    //   id: 4,
-    //   name: "Sunshine Kids World",
-    //   rating: 4.6,
-    //   reviewCount: 87,
-    //   price: "₹1,100/day",
-    //   location: "Hyderabad, Telangana",
-    //   image:
-    //     "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
-    //   badge: "Top Rated",
-    // },
+    {
+      id: 4,
+      name: "Sunshine Kids World",
+      rating: 4.6,
+      reviewCount: 87,
+      price: "₹1,100/day",
+      location: "Hyderabad, Telangana",
+      image:
+        "https://images.unsplash.com/photo-1540479859555-17af45c78602?auto=format&fit=crop&w=1170&q=80",
+      badge: "Top Rated",
+    },
   ];
 
   return (
@@ -68,8 +72,9 @@ export default function FeaturedDaycares() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {featuredDaycares.map((daycare) => (
             <div
+              onClick={() => router.push(`/daycares/${daycare.id}`)}
               key={daycare.id}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
+              className="group cursor-pointer bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
             >
               {/* Image */}
               <div className="relative h-48 w-full overflow-hidden">

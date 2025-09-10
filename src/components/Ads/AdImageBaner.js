@@ -55,6 +55,7 @@ export default function AdImageBanner() {
                         <Image 
                         width={800}
                         height={120}
+                        unoptimized
                             className="w-full h-[120px] object-cover"
                             src="https://placehold.co/800x120/EEE/31343C?font=montserrat&text=Ad%20Here%20800x120"
                             alt="Special offer - 20% off on first month enrollment at selected daycares"
