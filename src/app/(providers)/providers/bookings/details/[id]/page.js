@@ -162,10 +162,12 @@ const BookingDetailsPage = () => {
             <Download className="h-4 w-4 mr-2" />
             Invoice
           </Button>
+          <Link href={`/providers/bookings/edit/${booking.id}/`}>
           <Button onClick={handleEditBooking}>
             <Edit className="h-4 w-4 mr-2" />
             Edit Booking
           </Button>
+          </Link>
         </div>
       </div>
 

@@ -23,6 +23,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ChildrenManagementPage() {
     const [activeTab, setActiveTab] = useState("all");
@@ -255,9 +256,11 @@ export default function ChildrenManagementPage() {
                                 {/* Actions */}
                                 <div className="flex flex-col gap-2 self-stretch lg:self-center">
                                     <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="sm">
-                                            View Profile
-                                        </Button>
+                                        <Link href={`/providers/childrens/profile/${child.id}`}>
+                                            <Button variant="outline" size="sm">
+                                                View Profile
+                                            </Button>
+                                        </Link>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="ghost" size="icon">
@@ -266,8 +269,12 @@ export default function ChildrenManagementPage() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem>Check-in/Check-out</DropdownMenuItem>
-                                                <DropdownMenuItem>View Medical Records</DropdownMenuItem>
-                                                <DropdownMenuItem>Add Note</DropdownMenuItem>
+                                                <Link href={`/providers/childrens/profile/${child.id}?tab=medical`}>
+                                                    <DropdownMenuItem>View Medical Records</DropdownMenuItem>
+                                                </Link>
+                                                <Link href={`/providers/childrens/profile/${child.id}?tab=notes`}>
+                                                    <DropdownMenuItem>Add Note</DropdownMenuItem>
+                                                </Link>
                                                 <DropdownMenuItem>Message Parent</DropdownMenuItem>
                                                 <DropdownMenuItem className="text-red-600">
                                                     Remove Child

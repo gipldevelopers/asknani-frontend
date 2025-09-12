@@ -1,12 +1,13 @@
 "use client"
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Filter, Download, Eye, Calendar, User, CreditCard, Building, IndianRupee, Receipt } from 'lucide-react';
+import { Search, Filter, Download, Eye, Calendar, User, CreditCard, Building, IndianRupee, Receipt, CheckCircle, Clock, Users, DollarSign } from 'lucide-react';
+import Link from 'next/link';
 
 const PaymentsListPage = () => {
   const [payments, setPayments] = useState([]);
@@ -15,6 +16,12 @@ const PaymentsListPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('all');
   const [viewMode, setViewMode] = useState('card'); // 'card' or 'table'
+  const [summary, setSummary] = useState({
+    totalRevenue: 0,
+    completedPayments: 0,
+    pendingPayments: 0,
+    uniqueDaycares: 0,
+  });
 
   // Sample data - in a real app this would come from an API
   useEffect(() => {
@@ -124,7 +131,7 @@ const PaymentsListPage = () => {
         updatedAt: '2023-08-20T13:25:00Z'
       }
     ];
-    
+
     setPayments(samplePayments);
     setFilteredPayments(samplePayments);
   }, []);
@@ -132,29 +139,46 @@ const PaymentsListPage = () => {
   // Filter payments based on search term and filters
   useEffect(() => {
     let result = payments;
-    
+
     // Apply search term filter
     if (searchTerm) {
-      result = result.filter(payment => 
+      result = result.filter(payment =>
         payment.daycareName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         payment.parentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         payment.childName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         payment.id.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     // Apply status filter
     if (statusFilter !== 'all') {
       result = result.filter(payment => payment.status === statusFilter);
     }
-    
+
     // Apply payment status filter
     if (paymentStatusFilter !== 'all') {
       result = result.filter(payment => payment.paymentStatus === paymentStatusFilter);
     }
-    
+
     setFilteredPayments(result);
   }, [searchTerm, statusFilter, paymentStatusFilter, payments]);
+
+  // Calculate summary metrics
+  useEffect(() => {
+    if (payments.length > 0) {
+      const totalRevenue = payments.reduce((sum, p) => sum + p.total, 0);
+      const completedPayments = payments.filter(p => p.paymentStatus === 'completed').length;
+      const pendingPayments = payments.filter(p => p.paymentStatus === 'pending').length;
+      const uniqueDaycares = new Set(payments.map(p => p.daycareId)).size;
+
+      setSummary({
+        totalRevenue,
+        completedPayments,
+        pendingPayments,
+        uniqueDaycares,
+      });
+    }
+  }, [payments]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-IN', {
@@ -180,7 +204,7 @@ const PaymentsListPage = () => {
       cancelled: { variant: 'destructive', text: 'Cancelled' },
       refunded: { variant: 'secondary', text: 'Refunded' }
     };
-    
+
     const config = statusConfig[status] || { variant: 'outline', text: status };
     return <Badge variant={config.variant}>{config.text}</Badge>;
   };
@@ -193,7 +217,7 @@ const PaymentsListPage = () => {
       failed: { variant: 'destructive', text: 'Failed' },
       refunded: { variant: 'secondary', text: 'Refunded' }
     };
-    
+
     const config = statusConfig[status] || { variant: 'outline', text: status };
     return <Badge variant={config.variant}>{config.text}</Badge>;
   };
@@ -205,7 +229,7 @@ const PaymentsListPage = () => {
       netbanking: <Building className="h-4 w-4" />,
       wallet: <Receipt className="h-4 w-4" />
     };
-    
+
     return icons[method] || <CreditCard className="h-4 w-4" />;
   };
 
@@ -235,6 +259,66 @@ const PaymentsListPage = () => {
             Export
           </Button>
         </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Revenue
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(summary.totalRevenue)}</div>
+            <p className="text-xs text-muted-foreground">
+              Total value of all payments
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Completed Payments
+            </CardTitle>
+            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.completedPayments}</div>
+            <p className="text-xs text-muted-foreground">
+              Number of successful payments
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Pending Payments
+            </CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.pendingPayments}</div>
+            <p className="text-xs text-muted-foreground">
+              Number of payments awaiting action
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Unique Daycare Centers
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{summary.uniqueDaycares}</div>
+            <p className="text-xs text-muted-foreground">
+              Centers with at least one payment
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -348,10 +432,12 @@ const PaymentsListPage = () => {
                   </span>
                 </div>
                 <div className="flex space-x-2">
+                  <Link href={`/providers/payments/details/${payment.id}`}>
                   <Button variant="outline" size="sm" onClick={() => handleViewDetails(payment.id)}>
                     <Eye className="h-4 w-4 mr-1" />
                     Details
                   </Button>
+                  </Link>
                   <Button size="sm" onClick={() => handleDownloadInvoice(payment.id)}>
                     <Download className="h-4 w-4 mr-1" />
                     Invoice

@@ -15,7 +15,7 @@ export default function Home_section() {
     <>
 
       <AdImageBanner />
-      <AdPopUp/>
+      <AdPopUp />
       <HeroBanner />
       <CategorySlider />
       <FeaturedDaycares />
