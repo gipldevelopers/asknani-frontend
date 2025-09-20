@@ -7,6 +7,7 @@ import { Search, MapPin, ChevronDown, Menu, X, User } from "lucide-react";
 import { MessageCircle } from "lucide-react";
 import useUIStore from "@/stores/uiStore";
 import AdBanner from "../Ads/AdBanner";
+import useAuthStore from "@/stores/AuthStore";
 
 const indianCities = [
   "Mumbai",
@@ -50,9 +51,8 @@ export default function Navbar() {
     citySearchQuery,
     setCitySearchQuery,
     unreadCount,
-    isLoggedIn,
   } = useUIStore();
-
+  const { isLoggedIn } = useAuthStore();
   const cityDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
 
@@ -173,9 +173,7 @@ export default function Navbar() {
             <button
               onClick={toggleMobileSearch}
               className="md:hidden p-2 text-gray-500 hover:text-indigo-600"
-            >
-              <Search size={22} />
-            </button>
+            ></button>
 
             {/* Chat Icon */}
             {isLoggedIn && (

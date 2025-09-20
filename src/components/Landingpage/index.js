@@ -1,4 +1,5 @@
-
+"use client";
+import useAuthStore from "@/stores/AuthStore";
 import AdBanner from "../Ads/AdBanner";
 import AdImageBanner from "../Ads/AdImageBaner";
 import AdPopUp from "../Ads/AdPopUp";
@@ -11,9 +12,10 @@ import HeroBanner from "./HeroBanner";
 import WhyChooseUsSection from "./WhyChooseUsSection";
 
 export default function Home_section() {
+  const { loadToken } = useAuthStore();
+  loadToken();
   return (
     <>
-
       <AdImageBanner />
       {/* <AdPopUp /> */}
       <HeroBanner />

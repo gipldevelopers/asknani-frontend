@@ -1,6 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-
+import { Toaster } from "react-hot-toast";
 
 // Import Poppins
 const poppins = Poppins({
@@ -12,18 +12,16 @@ const poppins = Poppins({
 export const metadata = {
   title: "Day Care Marketplace",
   description: "A marketplace for daycare services",
-
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${poppins.variable} antialiased`}
-      >
-
+      <body className={`${poppins.variable} antialiased`}>
+        <Toaster
+       
+        />
         {children}
-
       </body>
     </html>
   );
