@@ -17,22 +17,18 @@ import useAuthStore from "@/stores/AuthStore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription } from "../ui/alert";
-
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const { setToken } = useAuthStore();
+  const { login } = useAuthStore(); // ✅ use store login
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuthStore();
+ const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -47,68 +43,39 @@ export default function LoginForm() {
     try {
       const res = await login(data);
 
-      // If login was successful
       if (res.success) {
-        setToken(res.data.token);
         toast.success(res.data.message || "Login successful!");
-        window.location.href = "/";
+        router.push("/"); // Redirect to dashboard or desired page
+      
       } else {
-        // Handle different error cases from backend
         const errorData = res.error?.response?.data;
 
         if (errorData) {
-          // Handle validation errors (422 status)
           if (res.error.response.status === 422 && errorData.errors) {
-            const backendErrors = errorData.errors;
-            Object.keys(backendErrors).forEach((field) =>
+            Object.keys(errorData.errors).forEach((field) =>
               setError(field, {
                 type: "server",
-                message: backendErrors[field][0],
+                message: errorData.errors[field][0],
               })
             );
-            setFormErrors(Object.values(backendErrors).flat());
-            toast.error(
-              errorData.message || "Please fix the highlighted errors"
-            );
-          }
-          // Handle invalid credentials (401 status)
-          else if (res.error.response.status === 401) {
-            // The backend returns email error for invalid credentials
-            if (errorData.errors && errorData.errors.email) {
-              setError("email", {
-                type: "server",
-                message: errorData.errors.email[0],
-              });
-              setError("password", {
-                type: "server",
-                message: " ", // Empty message to highlight the field
-              });
-              setFormErrors([errorData.errors.email[0]]);
-            } else {
-              setFormErrors([errorData.message || "Invalid credentials"]);
-            }
+            setFormErrors(Object.values(errorData.errors).flat());
+            toast.error(errorData.message || "Please fix the highlighted errors");
+          } else if (res.error.response.status === 401) {
+            setFormErrors([errorData.message || "Invalid credentials"]);
             toast.error(errorData.message || "Invalid credentials");
-          }
-          // Handle token generation errors (500 status)
-          else if (res.error.response.status === 500) {
-            setFormErrors([
-              errorData.message || "Server error, please try again",
-            ]);
+          } else if (res.error.response.status === 500) {
+            setFormErrors([errorData.message || "Server error, please try again"]);
             toast.error(errorData.message || "Server error, please try again");
-          }
-          // Handle other errors
-          else {
+          } else {
             setFormErrors([errorData.message || "Login failed"]);
             toast.error(errorData.message || "Login failed");
           }
         } else {
-          // Fallback for unexpected error format
           setFormErrors(["An unexpected error occurred"]);
           toast.error("An unexpected error occurred");
         }
       }
     } catch (error) {
-      // Handle any unexpected errors
       console.error("Login error:", error);
       setFormErrors(["Something went wrong. Please try again."]);
       toast.error("Something went wrong. Please try again.");
@@ -119,11 +86,9 @@ export default function LoginForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
-      {/* Centered, single-panel card */}
       <Card className="w-full max-w-sm overflow-hidden shadow-2xl rounded-2xl border-0 p-6">
         <CardHeader className="text-center px-0 pt-0">
           <div className="flex justify-center mb-4">
-            {/* Simple logo and branding at the top */}
             <div className="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center">
               <Baby className="h-8 w-8 text-white" />
             </div>
@@ -176,20 +141,14 @@ export default function LoginForm() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   className="pl-10 pr-10"
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
+                  {...register("password", { required: "Password is required" })}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               {errors.password && (
@@ -201,10 +160,7 @@ export default function LoginForm() {
             </div>
 
             <div className="text-right">
-              <Link
-                href="/forgot-password"
-                className="text-sm text-indigo-600 hover:underline"
-              >
+              <Link href="/forgot-password" className="text-sm text-indigo-600 hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -222,14 +178,7 @@ export default function LoginForm() {
                     fill="none"
                     viewBox="0 0 24 24"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path
                       className="opacity-75"
                       fill="currentColor"
@@ -248,10 +197,7 @@ export default function LoginForm() {
         <CardFooter className="px-0 pb-0 flex flex-col space-y-4 text-center">
           <p className="text-sm text-gray-600 mt-4">
             Don't have an account?{" "}
-            <Link
-              href="/signup"
-              className="text-indigo-600 hover:underline font-medium"
-            >
+            <Link href="/signup" className="text-indigo-600 hover:underline font-medium">
               Sign up
             </Link>
           </p>
@@ -260,9 +206,7 @@ export default function LoginForm() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">
-                Secure & encrypted
-              </span>
+              <span className="bg-white px-2 text-gray-500">Secure & encrypted</span>
             </div>
           </div>
           <div className="flex justify-center space-x-4">

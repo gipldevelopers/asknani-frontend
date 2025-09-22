@@ -12,8 +12,6 @@ import HeroBanner from "./HeroBanner";
 import WhyChooseUsSection from "./WhyChooseUsSection";
 
 export default function Home_section() {
-  const { loadToken } = useAuthStore();
-  loadToken();
   return (
     <>
       <AdImageBanner />

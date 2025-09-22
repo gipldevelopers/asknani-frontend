@@ -8,6 +8,7 @@ import { MessageCircle } from "lucide-react";
 import useUIStore from "@/stores/uiStore";
 import AdBanner from "../Ads/AdBanner";
 import useAuthStore from "@/stores/AuthStore";
+import { useRouter } from "next/navigation";
 
 const indianCities = [
   "Mumbai",
@@ -33,6 +34,7 @@ const indianCities = [
 ];
 
 export default function Navbar() {
+  const router = useRouter();
   const {
     isProfileOpen,
     toggleProfile,
@@ -52,7 +54,7 @@ export default function Navbar() {
     setCitySearchQuery,
     unreadCount,
   } = useUIStore();
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn, logout, user } = useAuthStore();
   const cityDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
 
@@ -75,11 +77,16 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeCityDropdown, closeProfile]);
+  console.log(user);
 
   const filteredCities = indianCities.filter((city) =>
     city.toLowerCase().includes(citySearchQuery.toLowerCase())
   );
+  const handleLogout = async () => {
+    await logout();
 
+    router.replace("/login");
+  };
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <AdBanner />
@@ -224,7 +231,10 @@ export default function Navbar() {
                       >
                         My Bookings
                       </Link>
-                      <button className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                      >
                         Log Out
                       </button>
                     </div>
@@ -308,7 +318,10 @@ export default function Navbar() {
                 >
                   My Bookings
                 </Link>
-                <button className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg">
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                >
                   Log Out
                 </button>
               </>

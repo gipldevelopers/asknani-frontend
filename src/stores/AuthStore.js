@@ -1,13 +1,13 @@
-//...
-import Cookies from "js-cookie";
+import { create } from "zustand";
+import { jwtDecode } from "jwt-decode"; // fix import
 import {
   login as apiLogin,
-  me as apiMe,
   logout as apiLogout,
   refresh as apiRefresh,
+  me as apiMe,
 } from "@/lib/authService";
 import toast from "react-hot-toast";
-import { create } from "zustand";
+import Cookies from "js-cookie";
 
 const useAuthStore = create((set, get) => ({
   token: null,
@@ -17,7 +17,10 @@ const useAuthStore = create((set, get) => ({
 
   setToken: (token) => {
     try {
-      Cookies.set("token", token, { secure: true, sameSite: "Strict" });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", token);
+        Cookies.set("token", token, { path: "/" });
+      }
       const user = jwtDecode(token);
       set({ token, user, isLoggedIn: true });
     } catch (e) {
@@ -26,15 +29,24 @@ const useAuthStore = create((set, get) => ({
   },
 
   loadToken: async () => {
-    const token = Cookies.get("token");
+    if (typeof window === "undefined") return;
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        // The API interceptor will handle token refreshes, so we only need to set the user from the decoded token.
-        // The subsequent api call will either succeed or trigger the refresh.
         set({ token, user: decoded, isLoggedIn: true });
+
+        // Fetch latest user data from backend
+        try {
+          const res = await apiMe();
+          if (res?.data) {
+            set({ user: res.data });
+          }
+        } catch (err) {
+          console.error("Failed to fetch user info:", err);
+          get().logout();
+        }
       } catch {
-        // If the token is invalid (malformed, etc.), clear it.
         get().logout();
       }
     }
@@ -43,47 +55,58 @@ const useAuthStore = create((set, get) => ({
   login: async (credentials) => {
     set({ loading: true });
     try {
-      const res = await apiLogin(credentials); // already returns {success, data}
+      const res = await apiLogin(credentials);
+      if (res?.data?.token) {
+        get().setToken(res.data.token);
 
-      if (res.success && res.data.token) {
-        const token = res.data.token;
-        Cookies.set("token", token, { secure: true, sameSite: "Strict" });
-        const user = jwtDecode(token);
-        set({ token, user, isLoggedIn: true, loading: false });
-        toast.success(res.data.message || "Logged in successfully");
+        // Fetch latest user info after login
+        try {
+          const meRes = await apiMe();
+          if (meRes?.data) set({ user: meRes.data });
+        } catch {}
+
+        set({ loading: false });
         return { success: true, data: res.data };
       } else {
         set({ loading: false });
-        toast.error(res.data?.message || "Login failed");
-        return { success: false, error: res.error || res.data };
+        return {
+          success: false,
+          error: res.data || { message: "Login failed" },
+        };
       }
     } catch (err) {
       set({ loading: false });
-      const msg =
-        err?.response?.data?.error ||
-        err?.response?.data?.message ||
-        "Login failed";
-      toast.error(msg);
-      return { success: false, error: err };
+      const message =
+        err?.response?.data?.message || err?.message || "Login failed";
+      return { success: false, error: { message } };
     }
   },
 
   logout: async () => {
     try {
-      // Again, withCredentials is not needed here
       await apiLogout();
-    } catch (e) {
-      // ignore errors
-    }
-    Cookies.remove("token");
+    } catch {}
+    if (typeof window !== "undefined") localStorage.removeItem("token");
+    Cookies.remove("token", { path: "/" });
     set({ token: null, user: null, isLoggedIn: false });
     toast.success("Logged out");
   },
 
-  // This method becomes unnecessary due to the interceptor
   refreshToken: async () => {
-    // This is handled by the axios interceptor now.
-    // The only place this logic should exist is in the API interceptor.
+    try {
+      const res = await apiRefresh();
+      if (res?.data?.token) {
+        get().setToken(res.data.token);
+        // Fetch updated user info after refresh
+        try {
+          const meRes = await apiMe();
+          if (meRes?.data) set({ user: meRes.data });
+        } catch {}
+      }
+    } catch (e) {
+      console.error("Token refresh failed", e);
+      get().logout();
+    }
   },
 }));
 

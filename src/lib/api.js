@@ -1,17 +1,14 @@
 import axios from "axios";
-import Cookies from "js-cookie"; // <-- Import Cookies
-// ... other imports
 
 const API = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
-  withCredentials: true, // <-- Correctly enable this for cookie-based auth
+  withCredentials: false, // no cookies needed
 });
 
-// Attach token to every request
+// Attach token from localStorage
 API.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    // Get token from cookies, not localStorage
-    const token = Cookies.get("token"); // <-- Get from cookies
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
@@ -20,7 +17,7 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor to attempt refresh on 401
+// Response interceptor to refresh token on 401
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -29,7 +26,6 @@ const processQueue = (error, token = null) => {
     if (error) prom.reject(error);
     else prom.resolve(token);
   });
-
   failedQueue = [];
 };
 
@@ -37,17 +33,26 @@ API.interceptors.response.use(
   (res) => res,
   async (err) => {
     const originalRequest = err.config;
-
     if (!originalRequest || !err.response) return Promise.reject(err);
 
-    // Skip refresh for login, register, forgot-password, reset-password
-    const skipRefresh = ["/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password"];
-    const isSkipEndpoint = skipRefresh.some((url) => originalRequest.url.includes(url));
+    const skipRefresh = [
+      "/auth/login",
+      "/auth/register",
+      "/auth/forgot-password",
+      "/auth/reset-password",
+    ];
 
-    if (err.response.status === 401 && !originalRequest._retry && !isSkipEndpoint) {
+    const isSkipEndpoint = skipRefresh.some((url) =>
+      originalRequest.url.includes(url)
+    );
+
+    if (
+      err.response.status === 401 &&
+      !originalRequest._retry &&
+      !isSkipEndpoint
+    ) {
       if (isRefreshing) {
-        // queue requests while refreshing
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
@@ -65,7 +70,7 @@ API.interceptors.response.use(
         const newToken = refreshResponse.data.token;
 
         if (newToken) {
-          Cookies.set("token", newToken, { secure: true, sameSite: "Strict" });
+          localStorage.setItem("token", newToken);
           API.defaults.headers.common.Authorization = "Bearer " + newToken;
           processQueue(null, newToken);
         }
@@ -76,7 +81,7 @@ API.interceptors.response.use(
       } catch (refreshError) {
         isRefreshing = false;
         processQueue(refreshError, null);
-        Cookies.remove("token");
+        localStorage.removeItem("token");
         return Promise.reject(refreshError);
       }
     }
@@ -84,6 +89,5 @@ API.interceptors.response.use(
     return Promise.reject(err);
   }
 );
-
 
 export default API;
