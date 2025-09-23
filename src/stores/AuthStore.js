@@ -83,9 +83,6 @@ const useAuthStore = create((set, get) => ({
   },
 
   logout: async () => {
-    try {
-      await apiLogout();
-    } catch {}
     if (typeof window !== "undefined") localStorage.removeItem("token");
     Cookies.remove("token", { path: "/" });
     set({ token: null, user: null, isLoggedIn: false });

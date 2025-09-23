@@ -1,10 +1,46 @@
-// components/provider-dashboard/overview.jsx
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Users, DollarSign, Star, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  DollarSign,
+  Star,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
 import Link from "next/link";
+import API from "@/lib/api";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardOverview() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const res = await API.get("/provider/daycare/status"); // your Laravel route
+        const { status } = res.data;
+
+        if (status === "not_created" || status === "incomplete") {
+          router.replace("/providers/contents"); // redirect
+        }
+        // else (pending, approved, rejected, suspended) → continue showing dashboard
+      } catch (error) {
+        console.error("Status check failed:", error);
+        router.replace("/providers/contents"); // fallback redirect
+      }
+    };
+
+    checkStatus();
+  }, [router]);
   const stats = [
     {
       title: "Total Bookings",
@@ -12,7 +48,7 @@ export default function DashboardOverview() {
       change: "+12%",
       trend: "up",
       icon: Calendar,
-      description: "This month"
+      description: "This month",
     },
     {
       title: "Active Children",
@@ -20,7 +56,7 @@ export default function DashboardOverview() {
       change: "+5%",
       trend: "up",
       icon: Users,
-      description: "Currently enrolled"
+      description: "Currently enrolled",
     },
     {
       title: "Revenue",
@@ -28,7 +64,7 @@ export default function DashboardOverview() {
       change: "+18%",
       trend: "up",
       icon: DollarSign,
-      description: "This month"
+      description: "This month",
     },
     {
       title: "Average Rating",
@@ -36,8 +72,8 @@ export default function DashboardOverview() {
       change: "+0.2",
       trend: "up",
       icon: Star,
-      description: "From 24 reviews"
-    }
+      description: "From 24 reviews",
+    },
   ];
 
   return (
@@ -45,10 +81,12 @@ export default function DashboardOverview() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Welcome back, Rajesh! Here&apos;s what&apos;s happening today.</p>
+          <p className="text-gray-600">
+            Welcome back, Rajesh! Here&apos;s what&apos;s happening today.
+          </p>
         </div>
         <Link href="/providers/bookings/new">
-        <Button>New Booking</Button>
+          <Button>New Booking</Button>
         </Link>
       </div>
 
@@ -57,7 +95,9 @@ export default function DashboardOverview() {
         {stats.map((stat, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {stat.title}
+              </CardTitle>
               <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -70,7 +110,9 @@ export default function DashboardOverview() {
                 )}
                 {stat.change} from last month
               </p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stat.description}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -81,24 +123,33 @@ export default function DashboardOverview() {
         <Card className="col-span-4">
           <CardHeader>
             <CardTitle>Recent Bookings</CardTitle>
-            <CardDescription>You have 12 new bookings this week</CardDescription>
+            <CardDescription>
+              You have 12 new bookings this week
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {[1, 2, 3].map((item) => (
-                <div key={item} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                <div
+                  key={item}
+                  className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                >
                   <div className="flex items-center space-x-4">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                       <Users className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <p className="font-medium">New booking request</p>
-                      <p className="text-sm text-gray-500">Priya Sharma - 2 children</p>
+                      <p className="text-sm text-gray-500">
+                        Priya Sharma - 2 children
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">Today, 10:30 AM</p>
-                    <Button variant="outline" size="sm" className="mt-1">View</Button>
+                    <Button variant="outline" size="sm" className="mt-1">
+                      View
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -127,7 +178,9 @@ export default function DashboardOverview() {
               ))}
             </div>
             <Link href={"/providers/tour-scheduled"}>
-            <Button variant="outline" className="w-full mt-4">View Full Calendar</Button>
+              <Button variant="outline" className="w-full mt-4">
+                View Full Calendar
+              </Button>
             </Link>
           </CardContent>
         </Card>

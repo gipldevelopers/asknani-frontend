@@ -19,6 +19,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import useAuthStore from "@/stores/AuthStore";
 
 export default function EmailVerificationPage() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function EmailVerificationPage() {
   const [status, setStatus] = useState("pending"); // pending, success, error
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(60); // for resend email cooldown
-
+  const { setToken } = useAuthStore();
   // Countdown for resend button
   useEffect(() => {
     let timer;
@@ -50,12 +51,16 @@ export default function EmailVerificationPage() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email?token=${token}`
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email?token=${token}&email=${email}`
       );
 
-      if (res.data?.user) {
+      if (res.data?.token) {
+        // ✅ auto-login by setting token in AuthStore
+        setToken(res.data.token);
+
         setStatus("success");
         toast.success("Email verified successfully!");
+
         // Redirect after short delay
         setTimeout(() => {
           router.push("/");
