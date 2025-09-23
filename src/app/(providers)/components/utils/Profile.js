@@ -11,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Settings, LogOut, User, Building2 } from "lucide-react";
 import useAuthStore from "@/stores/AuthStore";
 import { useRouter } from "next/navigation";
+import useDaycareAuthStore from "@/stores/ProvidersStore";
+import { useEffect } from "react";
 
 // ✅ use store logout
 export function ProfilePopover() {
@@ -20,6 +22,12 @@ export function ProfilePopover() {
     await logout();
     router.replace("/login");
   };
+  const { daycare, fetchDaycare } = useDaycareAuthStore();
+
+  useEffect(() => {
+    fetchDaycare();
+  }, [fetchDaycare]);
+
   const { user } = useAuthStore();
   return (
     <Popover className="p-2">
@@ -29,8 +37,13 @@ export function ProfilePopover() {
           className="h-10 px-2 lg:px-3 flex items-center gap-2 p-2"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatar.png" alt="Rajesh Kumar" />
-            <AvatarFallback>RK</AvatarFallback>
+            <AvatarFallback>
+              {user?.full_name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()}
+            </AvatarFallback>
           </Avatar>
 
           {/* Text only on large screens (your original block) */}
@@ -38,7 +51,7 @@ export function ProfilePopover() {
             <span className="text-sm font-semibold text-gray-900">
               {user?.full_name}
             </span>
-            <span className="text-xs text-gray-500">Sunshine Daycare</span>
+            <span className="text-xs text-gray-500">{daycare?.name}</span>
           </div>
         </Button>
       </PopoverTrigger>
@@ -47,14 +60,18 @@ export function ProfilePopover() {
         {/* Header */}
         <div className="px-4 py-3 flex items-center gap-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src="/avatar.png" alt="user profile" />
-            <AvatarFallback>RK</AvatarFallback>
+            <AvatarFallback>
+              {" "}
+              {user?.full_name
+                ?.split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <div className="leading-tight">
             <div className="text-sm font-semibold"> {user?.full_name}</div>
-            <div className="text-xs text-muted-foreground">
-              Sunshine Daycare
-            </div>
+            <div className="text-xs text-muted-foreground">{daycare?.name}</div>
           </div>
         </div>
 

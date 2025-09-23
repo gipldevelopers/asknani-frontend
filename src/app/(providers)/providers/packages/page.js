@@ -180,7 +180,7 @@ const PackagesPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const endpoint = pkg.is_active ? "deactivate" : "activate";
+      const endpoint = pkg.is_active ? "dectivate" : "activate";
       await API.put(`/provider/packages/${pkg.id}/${endpoint}`);
       await fetchPackages();
     } catch (err) {
@@ -223,7 +223,7 @@ const PackagesPage = () => {
           </p>
         </div>
         <Button onClick={handleAddPackage} className="mt-4 md:mt-0">
-      <Plus className="h-4 w-4 mr-2" /> Add New Package 
+          <Plus className="h-4 w-4 mr-2" /> Add New Package
         </Button>
       </div>
       {/* Conditional Rendering based on state */}

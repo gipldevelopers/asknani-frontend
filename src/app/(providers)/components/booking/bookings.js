@@ -1,11 +1,25 @@
 // components/provider-dashboard/bookings.jsx
 "use client";
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Calendar, Clock, User, MapPin, MoreVertical } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Calendar,
+  Clock,
+  User,
+  MapPin,
+  MoreVertical,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +28,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 
 export default function BookingsManagement() {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -28,7 +41,7 @@ export default function BookingsManagement() {
       time: "09:00 AM - 05:00 PM",
       status: "confirmed",
       address: "123 Koramangala, Bengaluru",
-      price: 2500
+      price: 2500,
     },
     {
       id: 2,
@@ -38,7 +51,7 @@ export default function BookingsManagement() {
       time: "08:30 AM - 04:30 PM",
       status: "pending",
       address: "456 Indiranagar, Bengaluru",
-      price: 1500
+      price: 1500,
     },
     {
       id: 3,
@@ -48,8 +61,8 @@ export default function BookingsManagement() {
       time: "10:00 AM - 06:00 PM",
       status: "confirmed",
       address: "789 HSR Layout, Bengaluru",
-      price: 3000
-    }
+      price: 3000,
+    },
   ];
 
   const getStatusVariant = (status) => {
@@ -99,16 +112,18 @@ export default function BookingsManagement() {
           </div>
 
           <div className="flex gap-2 mt-4 overflow-x-auto">
-            {["all", "confirmed", "pending", "cancelled", "completed"].map((status) => (
-              <Button
-                key={status}
-                variant={statusFilter === status ? "default" : "outline"}
-                size="sm"
-                onClick={() => setStatusFilter(status)}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </Button>
-            ))}
+            {["all", "confirmed", "pending", "cancelled", "completed"].map(
+              (status) => (
+                <Button
+                  key={status}
+                  variant={statusFilter === status ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter(status)}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </Button>
+              )
+            )}
           </div>
         </CardContent>
       </Card>
@@ -122,7 +137,9 @@ export default function BookingsManagement() {
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-semibold text-lg">{booking.parentName}</h3>
+                      <h3 className="font-semibold text-lg">
+                        {booking.parentName}
+                      </h3>
                       <p className="text-sm text-gray-600">
                         {booking.children.join(", ")}
                       </p>
@@ -161,8 +178,20 @@ export default function BookingsManagement() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => router.push(`/providers/bookings/details/${123}`)}>View Details</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => router.push(`/providers/bookings/edit/${123}`)}>Edit Booking</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(`/providers/bookings/details/${123}`)
+                        }
+                      >
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          router.push(`/providers/bookings/edit/${123}`)
+                        }
+                      >
+                        Edit Booking
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Send Message</DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600">
                         Cancel Booking

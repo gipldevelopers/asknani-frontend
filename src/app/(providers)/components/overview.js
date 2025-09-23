@@ -19,10 +19,13 @@ import Link from "next/link";
 import API from "@/lib/api";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import useAuthStore from "@/stores/AuthStore";
 
 export default function DashboardOverview() {
   const router = useRouter();
+  
 
+  const { user } = useAuthStore();
   useEffect(() => {
     const checkStatus = async () => {
       try {
@@ -82,7 +85,7 @@ export default function DashboardOverview() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">
-            Welcome back, Rajesh! Here&apos;s what&apos;s happening today.
+            Welcome back, {user?.name}! Here&apos;s what&apos;s happening today.
           </p>
         </div>
         <Link href="/providers/bookings/new">

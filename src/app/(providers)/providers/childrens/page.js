@@ -46,13 +46,21 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
+
 import Link from "next/link";
 import { format } from "date-fns";
 
 // Import your reusable components and API helper
 import API from "@/lib/api";
 import ParentSearchAndSelect from "../../components/ParentSearchAndSelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function ChildrenManagementPage() {
   const [children, setChildren] = useState([]);
@@ -230,7 +238,7 @@ export default function ChildrenManagementPage() {
               Add Child
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg max-h-64 overflow-y-auto">
+          <DialogContent className="max-w-lg max-h-full overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Child</DialogTitle>
               <DialogDescription>
@@ -260,7 +268,7 @@ export default function ChildrenManagementPage() {
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
-                            variant={"outline"}
+                            variant="outline"
                             className={cn(
                               "w-full justify-start text-left font-normal",
                               !formData.dob && "text-muted-foreground"
@@ -277,18 +285,35 @@ export default function ChildrenManagementPage() {
                         <PopoverContent className="w-auto p-0">
                           <Calendar
                             mode="single"
-                            selected={formData.dob}
-                            onSelect={handleDateSelect}
+                            captionLayout="dropdown-buttons" // ✅ enables Month + Year dropdowns
+                            fromYear={1900} // ✅ allow selecting DOB from 1900
+                            toYear={new Date().getFullYear()} // ✅ restrict DOB to current year
+                            selected={formData.dob || undefined}
+                            onSelect={(date) =>
+                              setFormData({ ...formData, dob: date ?? null })
+                            }
+                            disabled={(date) => date > new Date()} // ✅ prevent future DOB
                             initialFocus
                           />
                         </PopoverContent>
                       </Popover>
-                      <Input
-                        placeholder="Gender"
+
+                      <Select
                         name="gender"
                         value={formData.gender || ""}
-                        onChange={handleInputChange}
-                      />
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, gender: value })
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select Gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Input
                         placeholder="Allergies (e.g., Peanuts)"
                         name="allergies"
@@ -429,7 +454,7 @@ export default function ChildrenManagementPage() {
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
-                          variant={"outline"}
+                          variant="outline"
                           className={cn(
                             "w-full justify-start text-left font-normal",
                             !formData.dob && "text-muted-foreground"
@@ -446,17 +471,35 @@ export default function ChildrenManagementPage() {
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          selected={formData.dob}
-                          onSelect={handleDateSelect}
+                          captionLayout="dropdown-buttons" // ✅ enables Month + Year dropdowns
+                          fromYear={1900} // ✅ allow selecting DOB from 1900
+                          toYear={new Date().getFullYear()} // ✅ restrict DOB to current year
+                          selected={formData.dob || undefined}
+                          onSelect={(date) =>
+                            setFormData({ ...formData, dob: date ?? null })
+                          }
+                          disabled={(date) => date > new Date()} // ✅ prevent future DOB
                           initialFocus
                         />
                       </PopoverContent>
                     </Popover>
-                    <Input
-                      placeholder="Gender"
+
+                    <Select
                       name="gender"
-                      onChange={handleInputChange}
-                    />
+                      value={formData.gender || ""}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, gender: value })
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Input
                       placeholder="Allergies (e.g., Peanuts, Dairy)"
                       name="allergies"
@@ -495,28 +538,50 @@ export default function ChildrenManagementPage() {
               <CardContent className="pt-6">
                 <div className="flex flex-col lg:flex-row gap-6">
                   <div className="flex items-start space-x-4">
-                    <Image
-                      width={64}
-                      height={64}
-                      src={child.photo || "/placeholder-avatar.png"}
-                      alt={child.name}
-                      className="h-16 w-16 rounded-lg object-cover"
-                    />
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-lg">{child.name}</h3>
+                        <h3 className="font-semibold text-lg">
+                          {child.full_name}
+                        </h3>
                         <Badge variant={getStatusVariant(child.status)}>
                           {child.status}
                         </Badge>
                       </div>
                       <p className="text-sm text-gray-600">
-                        {child.age} • {child.parent?.full_name || "N/A"}&apos;s
-                        child
+                        {child.dob
+                          ? (() => {
+                              const dob = new Date(child.dob);
+                              const today = new Date();
+
+                              let years =
+                                today.getFullYear() - dob.getFullYear();
+                              let months = today.getMonth() - dob.getMonth();
+                              let days = today.getDate() - dob.getDate();
+
+                              if (days < 0) {
+                                months -= 1;
+                                days += new Date(
+                                  today.getFullYear(),
+                                  today.getMonth(),
+                                  0
+                                ).getDate();
+                              }
+
+                              if (months < 0) {
+                                years -= 1;
+                                months += 12;
+                              }
+
+                              // return in months only
+                              return years * 12 + months;
+                            })() + " months"
+                          : "N/A"}{" "}
+                        • {child.parent?.full_name || "N/A"}&apos;s child
                       </p>
                       <p className="text-sm text-gray-600">
                         DOB:{" "}
                         {child.dob
-                          ? format(new Date(child.dob), "MM/dd/yyyy")
+                          ? format(new Date(child.dob), "dd/MMMM/yy")
                           : "N/A"}
                       </p>
                     </div>
@@ -537,30 +602,20 @@ export default function ChildrenManagementPage() {
                           {child.specialNeeds || "None"}
                         </p>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">Attendance</p>
-                        <p className="text-gray-600">
-                          <span className="font-medium">Rate:</span>{" "}
-                          {child.attendance || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          <span className="font-medium">Last Check-in:</span>{" "}
-                          {child.lastCheckIn || "N/A"}
-                        </p>
-                      </div>
+                
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2 self-stretch lg:self-center">
                     <div className="flex items-center gap-2">
-                      <Link
+                      {/* <Link
                         href={`/providers/childrens/profile/${child.id}`}
                         passHref
                       >
                         <Button variant="outline" size="sm">
                           View Profile
                         </Button>
-                      </Link>
+                      </Link> */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -568,23 +623,20 @@ export default function ChildrenManagementPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            Check-in/Check-out
-                          </DropdownMenuItem>
-                          <Link
+                          {/* <Link
                             href={`/providers/childrens/profile/${child.id}?tab=medical`}
                           >
                             <DropdownMenuItem>
                               View Medical Records
                             </DropdownMenuItem>
-                          </Link>
-                          <Link
+                          </Link> */}
+                          {/* <Link
                             href={`/providers/childrens/profile/${child.id}?tab=notes`}
                           >
                             <DropdownMenuItem>Add Note</DropdownMenuItem>
-                          </Link>
+                          </Link> */}
                           <DropdownMenuItem>Message Parent</DropdownMenuItem>
-                          <DropdownMenuItem
+                          {/* <DropdownMenuItem
                             className="text-red-600"
                             onSelect={(e) => {
                               e.preventDefault();
@@ -592,7 +644,7 @@ export default function ChildrenManagementPage() {
                             }}
                           >
                             Remove Child
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
@@ -603,7 +655,7 @@ export default function ChildrenManagementPage() {
                   <div className="flex flex-wrap gap-4">
                     <div className="flex items-center text-sm text-gray-600">
                       <AlertCircle className="h-4 w-4 mr-1 text-amber-500" />
-                      Emergency: {child.emergencyContact}
+                      Emergency: {child.emergency_contact}
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <FileText className="h-4 w-4 mr-1 text-blue-500" />
