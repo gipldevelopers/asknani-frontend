@@ -59,7 +59,7 @@ export default function EmailVerificationPage() {
         // Redirect after short delay
         setTimeout(() => {
           router.push("/");
-        }, 2000);
+        }, 1500);
       } else {
         setStatus("error");
         toast.error(res.data?.message || "Verification failed");

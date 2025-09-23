@@ -59,7 +59,9 @@ export default function AddFacilityForm() {
               key={key}
               onClick={() => setIcon(key)}
               className={`flex flex-col items-center p-2 rounded ${
-                icon === key ? "bg-blue-100 border border-blue-500" : "hover:bg-gray-100"
+                icon === key
+                  ? "bg-blue-100 border border-blue-500"
+                  : "hover:bg-gray-100"
               }`}
             >
               <Icon className="w-6 h-6" />
