@@ -64,7 +64,7 @@ export default function ChildSearchAndSelect({
     }
 
     try {
-      const response = await API.post("/children", {
+      const response = await API.post(`/provider/parents/${guardianId}/children`, {
         ...newChildForm,
         parent_id: guardianId,
       });

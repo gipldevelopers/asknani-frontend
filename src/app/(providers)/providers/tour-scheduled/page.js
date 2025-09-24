@@ -9,131 +9,32 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Clock, MapPin, User, Phone, Mail, Search, Filter, CalendarDays, X, CheckCircle, Clock4 } from 'lucide-react';
+import { useTours } from '@/stores/useTours';
+import toast from 'react-hot-toast';
 
 export default function TourScheduledPage() {
   const [activeTab, setActiveTab] = useState("today");
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [tours, setTours] = useState([]);
-  const [todayTours, setTodayTours] = useState([]);
+  
+  const {
+    tours,
+    stats,
+    loading,
+    error,
+    updateTourStatus,
+    getTodayTours,
+    getUpcomingTours,
+    searchTours,
+    refreshData
+  } = useTours();
 
-  useEffect(() => {
-    // Sample data - in a real app this would come from an API
-    const sampleTours = [
-      {
-        id: 'T001',
-        parentName: 'Rahul Sharma',
-        parentEmail: 'rahul.sharma@email.com',
-        parentPhone: '+91 9876543210',
-        childName: 'Aarav Sharma',
-        childAge: 3,
-        tourDate: new Date(new Date().setHours(10, 0, 0, 0)).toISOString(),
-        status: 'scheduled',
-        duration: 30,
-        notes: 'Interested in full-day program. Wants to see outdoor play area.',
-        daycareId: 'DC001',
-        daycareName: 'Sunshine Daycare Center',
-        address: '123 Main Street, Bangalore'
-      },
-      {
-        id: 'T002',
-        parentName: 'Priya Patel',
-        parentEmail: 'priya.patel@email.com',
-        parentPhone: '+91 9876543211',
-        childName: 'Ananya Patel',
-        childAge: 4,
-        tourDate: new Date(new Date().setHours(14, 30, 0, 0)).toISOString(),
-        status: 'scheduled',
-        duration: 45,
-        notes: 'Looking for half-day program. Asked about meal options.',
-        daycareId: 'DC001',
-        daycareName: 'Sunshine Daycare Center',
-        address: '123 Main Street, Bangalore'
-      },
-      {
-        id: 'T003',
-        parentName: 'Vikram Singh',
-        parentEmail: 'vikram.singh@email.com',
-        parentPhone: '+91 9876543212',
-        childName: 'Vihaan Singh',
-        childAge: 2,
-        tourDate: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(),
-        status: 'scheduled',
-        duration: 30,
-        notes: 'Interested in toddler program. Wants to meet head teacher.',
-        daycareId: 'DC001',
-        daycareName: 'Sunshine Daycare Center',
-        address: '123 Main Street, Bangalore'
-      },
-      {
-        id: 'T004',
-        parentName: 'Neha Gupta',
-        parentEmail: 'neha.gupta@email.com',
-        parentPhone: '+91 9876543213',
-        childName: 'Advik Gupta',
-        childAge: 5,
-        tourDate: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString(),
-        status: 'completed',
-        duration: 45,
-        notes: 'Tour completed. Liked facilities. Will decide by weekend.',
-        daycareId: 'DC001',
-        daycareName: 'Sunshine Daycare Center',
-        address: '123 Main Street, Bangalore'
-      },
-      {
-        id: 'T005',
-        parentName: 'Arun Kumar',
-        parentEmail: 'arun.kumar@email.com',
-        parentPhone: '+91 9876543214',
-        childName: 'Aisha Kumar',
-        childAge: 3,
-        tourDate: new Date(new Date().setDate(new Date().getDate() - 2)).toISOString(),
-        status: 'cancelled',
-        duration: 30,
-        notes: 'Cancelled due to illness. Will reschedule next week.',
-        daycareId: 'DC001',
-        daycareName: 'Sunshine Daycare Center',
-        address: '123 Main Street, Bangalore'
-      },
-      {
-        id: 'T006',
-        parentName: 'Sneha Reddy',
-        parentEmail: 'sneha.reddy@email.com',
-        parentPhone: '+91 9876543215',
-        childName: 'Reyansh Reddy',
-        childAge: 4,
-        tourDate: new Date(new Date().setHours(16, 0, 0, 0)).toISOString(),
-        status: 'scheduled',
-        duration: 30,
-        notes: 'Wants to know about after-school activities.',
-        daycareId: 'DC001',
-        daycareName: 'Sunshine Daycare Center',
-        address: '123 Main Street, Bangalore'
-      }
-    ];
-
-    setTours(sampleTours);
-
-    // Filter today's tours
-    const today = new Date().toDateString();
-    const todaysTours = sampleTours.filter(tour => {
-      const tourDate = new Date(tour.tourDate).toDateString();
-      return tourDate === today && tour.status === 'scheduled';
-    });
-    setTodayTours(todaysTours);
-  }, []);
-
-  const filteredTours = tours.filter(tour => {
-    const matchesSearch = searchTerm === '' ||
-      tour.parentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tour.childName.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = statusFilter === 'all' || tour.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
+  const todayTours = getTodayTours();
+  const upcomingTours = getUpcomingTours();
+  const filteredTours = searchTours(searchTerm, statusFilter);
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-IN', {
       weekday: 'short',
       day: 'numeric',
@@ -143,6 +44,7 @@ export default function TourScheduledPage() {
   };
 
   const formatTime = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleTimeString('en-IN', {
       hour: '2-digit',
       minute: '2-digit'
@@ -154,25 +56,63 @@ export default function TourScheduledPage() {
       'scheduled': { variant: 'default', text: 'Scheduled' },
       'completed': { variant: 'secondary', text: 'Completed' },
       'cancelled': { variant: 'destructive', text: 'Cancelled' },
-      'noshow': { variant: 'outline', text: 'No Show' }
     };
 
     const config = statusConfig[status] || { variant: 'outline', text: status };
     return <Badge variant={config.variant}>{config.text}</Badge>;
   };
 
-  const handleStatusChange = (tourId, newStatus) => {
-    setTours(prev => prev.map(tour =>
-      tour.id === tourId ? { ...tour, status: newStatus } : tour
-    ));
+  const handleStatusChange = async (tourId, newStatus) => {
+    const result = await updateTourStatus(tourId, newStatus);
+    
+    if (result.success) {
+      toast.success(`Tour ${newStatus} successfully`);
+    } else {
+      toast.error(result.error || 'Failed to update tour status');
+    }
   };
 
-  const stats = {
-    total: tours.length,
-    scheduled: tours.filter(tour => tour.status === 'scheduled').length,
-    completed: tours.filter(tour => tour.status === 'completed').length,
-    today: todayTours.length
+  const getParentInfo = (tour) => {
+    return {
+      name: tour.parent?.name || tour.parent_name || 'N/A',
+      email: tour.parent?.email || tour.parent_email || 'N/A',
+      phone: tour.parent?.phone || tour.parent_phone || 'N/A'
+    };
   };
+
+  const getChildInfo = (tour) => {
+    return {
+      name: tour.child?.name || tour.child_name || 'N/A',
+      age: tour.child?.age || tour.child_age || 'N/A'
+    };
+  };
+
+  if (loading && tours.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p>Loading tours...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <div className="text-red-500 mb-4">Error</div>
+            <h3 className="text-lg font-medium mb-2">{error}</h3>
+            <Button onClick={refreshData}>Retry</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -181,9 +121,9 @@ export default function TourScheduledPage() {
           <h1 className="text-3xl font-bold">Scheduled Tours</h1>
           <p className="text-muted-foreground">Manage and track facility tours</p>
         </div>
-        <Button>
-          <CalendarDays className="h-4 w-4 mr-2" />
-          Schedule New Tour
+        <Button onClick={refreshData} variant="outline">
+          <Clock4 className="h-4 w-4 mr-2" />
+          Refresh
         </Button>
       </div>
 
@@ -195,9 +135,7 @@ export default function TourScheduledPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">
-              All scheduled tours
-            </p>
+            <p className="text-xs text-muted-foreground">All scheduled tours</p>
           </CardContent>
         </Card>
 
@@ -207,9 +145,7 @@ export default function TourScheduledPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.scheduled}</div>
-            <p className="text-xs text-muted-foreground">
-              Yet to be conducted
-            </p>
+            <p className="text-xs text-muted-foreground">Yet to be conducted</p>
           </CardContent>
         </Card>
 
@@ -219,9 +155,7 @@ export default function TourScheduledPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.completed}</div>
-            <p className="text-xs text-muted-foreground">
-              Successfully conducted
-            </p>
+            <p className="text-xs text-muted-foreground">Successfully conducted</p>
           </CardContent>
         </Card>
 
@@ -231,88 +165,89 @@ export default function TourScheduledPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.today}</div>
-            <p className="text-xs text-muted-foreground">
-              Scheduled for today
-            </p>
+            <p className="text-xs text-muted-foreground">Scheduled for today</p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="today">Today&apos;s Tours</TabsTrigger>
-          <TabsTrigger value="all">All Tours</TabsTrigger>
+          <TabsTrigger value="today">Today&apos;s Tours ({todayTours.length})</TabsTrigger>
+          <TabsTrigger value="all">All Tours ({tours.length})</TabsTrigger>
         </TabsList>
 
         {/* Today's Tours Tab */}
         <TabsContent value="today">
           {todayTours.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {todayTours.map(tour => (
-                <Card key={tour.id} className="relative">
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{tour.parentName}</CardTitle>
-                        <CardDescription>
-                          Tour for {tour.childName} ({tour.childAge} years)
-                        </CardDescription>
+              {todayTours.map(tour => {
+                const parent = getParentInfo(tour);
+                const child = getChildInfo(tour);
+                
+                return (
+                  <Card key={tour.id} className="relative">
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">{parent.name}</CardTitle>
+                          <CardDescription>
+                            Tour for {child.name} {child.age && `(${child.age} years)`}
+                          </CardDescription>
+                        </div>
+                        <Badge variant="outline" className="flex items-center">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {formatTime(tour.scheduled_at || tour.tour_date)}
+                        </Badge>
                       </div>
-                      <Badge variant="outline" className="flex items-center">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {formatTime(tour.tourDate)}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center text-sm">
-                      <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {tour.parentPhone}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {tour.parentEmail}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {tour.address}
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {tour.duration} minutes
-                    </div>
-                    {tour.notes && (
-                      <div className="mt-2">
-                        <Label className="text-sm">Notes</Label>
-                        <p className="text-sm text-muted-foreground">{tour.notes}</p>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center text-sm">
+                        <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                        {parent.phone}
                       </div>
-                    )}
-                  </CardContent>
-                  <CardFooter className="flex justify-between border-t pt-4">
-                    <Button variant="outline" size="sm">
-                      <Phone className="h-4 w-4 mr-1" />
-                      Call
-                    </Button>
-                    <div className="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleStatusChange(tour.id, 'cancelled')}
-                      >
-                        <X className="h-4 w-4 mr-1" />
-                        Cancel
+                      <div className="flex items-center text-sm">
+                        <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+                        {parent.email}
+                      </div>
+                      <div className="flex items-center text-sm">
+                        <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
+                        {tour.duration || 30} minutes
+                      </div>
+                      {tour.notes && (
+                        <div className="mt-2">
+                          <Label className="text-sm">Notes</Label>
+                          <p className="text-sm text-muted-foreground">{tour.notes}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                    <CardFooter className="flex justify-between border-t pt-4">
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={`tel:${parent.phone}`}>
+                          <Phone className="h-4 w-4 mr-1" />
+                          Call
+                        </a>
                       </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleStatusChange(tour.id, 'completed')}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Complete
-                      </Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleStatusChange(tour.id, 'cancelled')}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Cancel
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleStatusChange(tour.id, 'completed')}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Complete
+                        </Button>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <Card>
@@ -322,10 +257,6 @@ export default function TourScheduledPage() {
                 <p className="text-muted-foreground text-center mb-4">
                   You don&apos;t have any facility tours scheduled for today.
                 </p>
-                <Button>
-                  <CalendarDays className="h-4 w-4 mr-2" />
-                  Schedule a Tour
-                </Button>
               </CardContent>
             </Card>
           )}
@@ -356,7 +287,6 @@ export default function TourScheduledPage() {
                     <SelectItem value="scheduled">Scheduled</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
                     <SelectItem value="cancelled">Cancelled</SelectItem>
-                    <SelectItem value="noshow">No Show</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -364,45 +294,54 @@ export default function TourScheduledPage() {
             <CardContent>
               {filteredTours.length > 0 ? (
                 <div className="divide-y">
-                  {filteredTours.map(tour => (
-                    <div key={tour.id} className="py-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start space-x-4">
-                          <div className="bg-primary/10 p-2 rounded-full">
-                            <User className="h-5 w-5 text-primary" />
+                  {filteredTours.map(tour => {
+                    const parent = getParentInfo(tour);
+                    const child = getChildInfo(tour);
+                    
+                    return (
+                      <div key={tour.id} className="py-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex items-start space-x-4">
+                            <div className="bg-primary/10 p-2 rounded-full">
+                              <User className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <div className="font-semibold">{parent.name}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {child.name} {child.age && `(${child.age} years)`}
+                              </div>
+                              <div className="flex items-center mt-1 text-sm">
+                                <Calendar className="h-3 w-3 mr-1 text-muted-foreground" />
+                                {formatDate(tour.scheduled_at || tour.tour_date)}
+                                <span className="mx-2">•</span>
+                                <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
+                                {formatTime(tour.scheduled_at || tour.tour_date)}
+                                <span className="mx-2">•</span>
+                                {getStatusBadge(tour.status)}
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <div className="font-semibold">{tour.parentName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {tour.childName} ({tour.childAge} years)
-                            </div>
-                            <div className="flex items-center mt-1 text-sm">
-                              <Calendar className="h-3 w-3 mr-1 text-muted-foreground" />
-                              {formatDate(tour.tourDate)}
-                              <span className="mx-2">•</span>
-                              <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
-                              {formatTime(tour.tourDate)}
-                              <span className="mx-2">•</span>
-                              {getStatusBadge(tour.status)}
-                            </div>
+                          <div className="flex items-center space-x-2">
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={`tel:${parent.phone}`}>
+                                <Phone className="h-4 w-4" />
+                              </a>
+                            </Button>
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={`mailto:${parent.email}`}>
+                                <Mail className="h-4 w-4" />
+                              </a>
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Phone className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        {tour.notes && (
+                          <div className="mt-2 ml-12">
+                            <p className="text-sm text-muted-foreground">{tour.notes}</p>
+                          </div>
+                        )}
                       </div>
-                      {tour.notes && (
-                        <div className="mt-2 ml-12">
-                          <p className="text-sm text-muted-foreground">{tour.notes}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-8">
@@ -423,11 +362,9 @@ export default function TourScheduledPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Clock4 className="h-5 w-5 mr-2" />
-            Upcoming Tours
+            Upcoming Tours (Next 7 Days)
           </CardTitle>
-          <CardDescription>
-            Tours scheduled for the next 7 days
-          </CardDescription>
+          <CardDescription>Tours scheduled for the next 7 days</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -443,30 +380,33 @@ export default function TourScheduledPage() {
                 </tr>
               </thead>
               <tbody>
-                {tours
-                  .filter(tour => tour.status === 'scheduled')
-                  .sort((a, b) => new Date(a.tourDate) - new Date(b.tourDate))
+                {upcomingTours
+                  .sort((a, b) => new Date(a.scheduled_at || a.tour_date) - new Date(b.scheduled_at || b.tour_date))
                   .slice(0, 5)
-                  .map(tour => (
-                    <tr key={tour.id} className="border-b">
-                      <td className="py-3">
-                        <div className="font-medium">{formatDate(tour.tourDate)}</div>
-                        <div className="text-sm text-muted-foreground">{formatTime(tour.tourDate)}</div>
-                      </td>
-                      <td className="py-3">{tour.parentName}</td>
-                      <td className="py-3">
-                        {tour.childName} ({tour.childAge} yrs)
-                      </td>
-                      <td className="py-3">{tour.duration} min</td>
-                      <td className="py-3">{getStatusBadge(tour.status)}</td>
-                      <td className="py-3 text-right">
-                        <Button variant="outline" size="sm">
-                          View Details
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                }
+                  .map(tour => {
+                    const parent = getParentInfo(tour);
+                    const child = getChildInfo(tour);
+                    
+                    return (
+                      <tr key={tour.id} className="border-b">
+                        <td className="py-3">
+                          <div className="font-medium">{formatDate(tour.scheduled_at || tour.tour_date)}</div>
+                          <div className="text-sm text-muted-foreground">{formatTime(tour.scheduled_at || tour.tour_date)}</div>
+                        </td>
+                        <td className="py-3">{parent.name}</td>
+                        <td className="py-3">
+                          {child.name} {child.age && `(${child.age} yrs)`}
+                        </td>
+                        <td className="py-3">{tour.duration || 30} min</td>
+                        <td className="py-3">{getStatusBadge(tour.status)}</td>
+                        <td className="py-3 text-right">
+                          <Button variant="outline" size="sm">
+                            View Details
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>

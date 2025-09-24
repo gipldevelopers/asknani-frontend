@@ -9,6 +9,7 @@ import useUIStore from "@/stores/uiStore";
 import AdBanner from "../Ads/AdBanner";
 import useAuthStore from "@/stores/AuthStore";
 import { useRouter } from "next/navigation";
+import { useDaycares } from "@/stores/DaycareStore";
 
 const indianCities = [
   "Mumbai",
@@ -32,6 +33,7 @@ const indianCities = [
   "Nashik",
   "Vadodara",
 ];
+const { cities, loading, error } = useDaycares();
 
 export default function Navbar() {
   const router = useRouter();

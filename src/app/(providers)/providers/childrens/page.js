@@ -285,7 +285,7 @@ export default function ChildrenManagementPage() {
                         <PopoverContent className="w-auto p-0">
                           <Calendar
                             mode="single"
-                            captionLayout="dropdown-buttons" // ✅ enables Month + Year dropdowns
+                            captionLayout="captionLayout" // ✅ enables Month + Year dropdowns
                             fromYear={1900} // ✅ allow selecting DOB from 1900
                             toYear={new Date().getFullYear()} // ✅ restrict DOB to current year
                             selected={formData.dob || undefined}
@@ -471,7 +471,7 @@ export default function ChildrenManagementPage() {
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
-                          captionLayout="dropdown-buttons" // ✅ enables Month + Year dropdowns
+                          captionLayout="captionLayout" // ✅ enables Month + Year dropdowns
                           fromYear={1900} // ✅ allow selecting DOB from 1900
                           toYear={new Date().getFullYear()} // ✅ restrict DOB to current year
                           selected={formData.dob || undefined}
