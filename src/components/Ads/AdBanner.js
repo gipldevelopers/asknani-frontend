@@ -1,13 +1,22 @@
 // components/AdBanner.js
 "use client";
 import { X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AdBanner() {
   const [isVisible, setIsVisible] = useState(true);
 
+  // On mount, check localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("bannerClosed");
+    if (stored === "true") {
+      setIsVisible(false);
+    }
+  }, []);
+
   const closeBanner = () => {
     setIsVisible(false);
+    localStorage.setItem("bannerClosed", "true");
   };
 
   if (!isVisible) return null;

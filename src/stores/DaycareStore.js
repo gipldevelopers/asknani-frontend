@@ -1,57 +1,32 @@
-// hooks/useDaycares.js
-
+// stores/DaycareStore.js
+import { create } from "zustand";
 import { DaycaresServices } from "@/lib/DaycaresServices";
-import { useState, useEffect } from "react";
 
-export const useDaycares = () => {
-  const [cities, setCities] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+const useDaycareStore = create((set) => ({
+  cities: [],
+  loading: false,
+  error: null,
 
-  // Fetch cities with approved daycares
-  const fetchCities = async () => {
+  fetchCities: async () => {
     try {
-      setLoading(true);
-      setError(null);
+      set({ loading: true, error: null });
       const response = await DaycaresServices.getCities();
-
-      // Handle response (assuming it’s { cities: [...] })
-      setCities(response.data.cities || []);
+      set({ cities: response.data.cities || [] });
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to fetch cities";
-      setError(errorMsg);
-      console.error("Error fetching cities:", err);
+      set({ error: errorMsg });
     } finally {
-      setLoading(false);
+      set({ loading: false });
     }
-  };
+  },
 
-  // Search/filter cities by name
-  const searchCities = (searchTerm) => {
-    return cities.filter((city) =>
-      city.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
-
-  // Get total approved daycares across all cities
-  const getTotalDaycares = () => {
+  getTotalDaycares: () => {
+    const { cities } = useDaycareStore.getState();
     return cities.reduce(
       (sum, city) => sum + (city.approved_daycares_count || 0),
       0
     );
-  };
+  },
+}));
 
-  useEffect(() => {
-    fetchCities();
-  }, []);
-
-  return {
-    cities,
-    loading,
-    error,
-    fetchCities,
-    searchCities,
-    getTotalDaycares,
-    refreshData: fetchCities,
-  };
-};
+export default useDaycareStore;

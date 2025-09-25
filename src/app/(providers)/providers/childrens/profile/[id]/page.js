@@ -64,7 +64,7 @@ const ChildrenProfilePage = () => {
       // Optional: Add a redirect if the ID is missing after initial load
       // router.push('/providers/childrens');
     }
-  }, [id]);
+  }, [id, searchParams]);
 
   // Keep state in sync with URL
   useEffect(() => {

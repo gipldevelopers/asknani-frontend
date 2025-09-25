@@ -29,10 +29,8 @@ const ProviderDashboardLayout = ({ children }) => {
 
   useEffect(() => {
     loadToken(); // ✅ load token once on app mount
-  }, []);
+  }, [loadToken]);
 
-
-  
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigation = [

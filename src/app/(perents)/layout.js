@@ -9,7 +9,7 @@ export default function Layout({ children }) {
 
   useEffect(() => {
     loadToken(); // ✅ load token once on app mount
-  }, []);
+  }, [loadToken]);
 
   return (
     <div className="min-h-screen flex flex-col">

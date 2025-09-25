@@ -29,7 +29,7 @@ const ProviderDashboardLayout = ({ children }) => {
 
   useEffect(() => {
     loadToken(); // ✅ load token once on app mount
-  }, []);
+  }, [loadToken]);
 
 
   

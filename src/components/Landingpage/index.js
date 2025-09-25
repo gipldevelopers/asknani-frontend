@@ -14,6 +14,7 @@ import WhyChooseUsSection from "./WhyChooseUsSection";
 export default function Home_section() {
   return (
     <>
+      {<AdBanner />}
       <AdImageBanner />
       {/* <AdPopUp /> */}
       <HeroBanner />

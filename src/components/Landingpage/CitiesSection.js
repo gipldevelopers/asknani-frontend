@@ -1,13 +1,20 @@
 "use client";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useDaycares } from "@/stores/DaycareStore";
+import useDaycareStore from "@/stores/DaycareStore"; // ✅ Updated import
 
 export default function CitiesSection() {
   const scrollRef = useRef(null);
-  const { cities, loading, error } = useDaycares();
+  
+  // ✅ Zustand store
+  const { cities, loading, error, fetchCities } = useDaycareStore();
+
+  // Fetch cities on mount
+  useEffect(() => {
+    fetchCities();
+  }, [fetchCities]);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -24,15 +31,11 @@ export default function CitiesSection() {
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Popular Cities in India
           </h2>
-          <p className="text-lg text-gray-600">
-            Find trusted daycares near you
-          </p>
+          <p className="text-lg text-gray-600">Find trusted daycares near you</p>
         </div>
 
         {/* Loading/Error States */}
-        {loading && (
-          <p className="text-center text-gray-500">Loading cities...</p>
-        )}
+        {loading && <p className="text-center text-gray-500">Loading cities...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
 
         {/* Slider */}
@@ -73,9 +76,7 @@ export default function CitiesSection() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
                       <div className="p-4 text-white">
                         <h3 className="text-lg font-bold">{city.name}</h3>
-                        <p className="text-sm">
-                          {city.approved_daycares_count} daycares
-                        </p>
+                        <p className="text-sm">{city.approved_daycares_count} daycares</p>
                       </div>
                     </div>
                   </Link>

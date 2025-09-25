@@ -1,57 +1,60 @@
-// app/chats/page.js
 "use client";
-import { useState } from "react";
-import { Search, Filter, ChevronLeft, MoreHorizontal, MessageSquare } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Search,
+  Filter,
+  ChevronLeft,
+  MoreHorizontal,
+  MessageSquare,
+} from "lucide-react";
 import ChatListItem from "@/components/chat/ChatListItem";
 import Link from "next/link";
 import Image from "next/image";
+import API from "@/lib/api";
 
 export default function ChatsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [activeChat, setActiveChat] = useState(null);
+  const [chats, setChats] = useState([]); // Will store mapped contacts
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Sample chat data
-  const chats = [
-    {
-      id: 1,
-      daycareName: "Sunshine Kids Daycare",
-      lastMessage: "Great! We'll see you tomorrow at 10 AM",
-      timestamp: "10:42 AM",
-      unreadCount: 0,
-      avatar: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-      isOnline: true
-    },
-    {
-      id: 2,
-      daycareName: "Little Explorers Preschool",
-      lastMessage: "We have an opening for your son's age group",
-      timestamp: "Yesterday",
-      unreadCount: 3,
-      avatar: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-      isOnline: false
-    },
-    {
-      id: 3,
-      daycareName: "Bright Beginnings Center",
-      lastMessage: "Thanks for submitting the application form",
-      timestamp: "Yesterday",
-      unreadCount: 0,
-      avatar: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-      isOnline: true
-    },
-    {
-      id: 4,
-      daycareName: "Happy Tots Childcare",
-      lastMessage: "Could you provide the vaccination records?",
-      timestamp: "Monday",
-      unreadCount: 1,
-      avatar: "https://images.unsplash.com/photo-1563453392212-326f5e854473?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80",
-      isOnline: false
-    },
-  ];
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const res = await API.get("/contacts/parent"); // Your backend endpoint
+        if (res.data.status === "success") {
+          // Map backend response to chat format
+          const mappedChats = res.data.contacts.map((contact) => ({
+            id: contact.daycare_id,
+            daycareName: contact.name,
+            lastMessage: contact.lastMessage || "No messages yet",
+            timestamp: contact.lastContact
+              ? new Date(contact.lastContact).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "",
+            unreadCount: contact.unreadCount,
+            avatar: contact.avatar || "/images/default-daycare.jpg", // fallback image
+          }));
+          setChats(mappedChats);
+        } else {
+          setError(res.data.message || "Failed to fetch contacts");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Something went wrong while fetching contacts.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredChats = chats.filter(chat => {
+    fetchContacts();
+  }, []);
+
+  const filteredChats = chats.filter((chat) => {
     const matchesSearch =
       chat.daycareName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
@@ -61,6 +64,9 @@ export default function ChatsPage() {
     }
     return matchesSearch;
   });
+
+  if (loading) return <p>Loading contacts...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
@@ -78,7 +84,7 @@ export default function ChatsPage() {
               <h1 className="text-xl font-semibold text-gray-900">Messages</h1>
               {activeFilter === "unread" && (
                 <span className="ml-2 bg-primary text-white text-xs font-medium px-2 py-0.5 rounded-full">
-                  {chats.filter(chat => chat.unreadCount > 0).length}
+                  {chats.filter((chat) => chat.unreadCount > 0).length}
                 </span>
               )}
             </div>
@@ -104,10 +110,11 @@ export default function ChatsPage() {
                 onClick={() =>
                   setActiveFilter(activeFilter === "unread" ? "all" : "unread")
                 }
-                className={`px-3 py-2 rounded-lg flex items-center transition ${activeFilter === "unread"
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
+                className={`px-3 py-2 rounded-lg flex items-center transition ${
+                  activeFilter === "unread"
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
               >
                 <Filter className="h-4 w-4" />
               </button>
@@ -119,12 +126,15 @@ export default function ChatsPage() {
         <main className="flex-1 overflow-y-auto">
           {filteredChats.length > 0 ? (
             <div className="divide-y divide-gray-100">
-              {filteredChats.map(chat => (
+              {filteredChats.map((chat) => (
                 <div
                   key={chat.id}
                   onClick={() => setActiveChat(chat)}
-                  className={`cursor-pointer transition ${activeChat?.id === chat.id ? "bg-primary/5" : "hover:bg-gray-50"
-                    }`}
+                  className={`cursor-pointer transition ${
+                    activeChat?.id === chat.id
+                      ? "bg-primary/5"
+                      : "hover:bg-gray-50"
+                  }`}
                 >
                   <ChatListItem chat={chat} />
                 </div>
@@ -135,7 +145,9 @@ export default function ChatsPage() {
               <div className="bg-gray-100 p-4 rounded-full mb-4">
                 <Search className="h-8 w-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">No messages found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">
+                No messages found
+              </h3>
               <p className="text-gray-500">
                 {searchQuery
                   ? "Try a different search term"
@@ -151,13 +163,15 @@ export default function ChatsPage() {
         {activeChat ? (
           <div className="flex flex-col items-center justify-center text-center p-6 max-w-lg">
             <Image
-              width={20}
-              height={20}
+              width={80}
+              height={80}
               src={activeChat.avatar}
               alt={activeChat.daycareName}
               className="w-20 h-20 rounded-full mb-4 ring-4 ring-primary/10"
             />
-            <h2 className="text-xl font-semibold text-gray-900">{activeChat.daycareName}</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              {activeChat.daycareName}
+            </h2>
             <p className="text-gray-500 mt-2">{activeChat.lastMessage}</p>
             <button className="mt-6 px-6 py-2 rounded-full bg-primary text-white font-medium hover:bg-primary/90 transition">
               Open Chat

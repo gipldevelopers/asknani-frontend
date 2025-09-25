@@ -5,38 +5,16 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Search, MapPin, ChevronDown, Menu, X, User } from "lucide-react";
 import { MessageCircle } from "lucide-react";
-import useUIStore from "@/stores/uiStore";
-import AdBanner from "../Ads/AdBanner";
-import useAuthStore from "@/stores/AuthStore";
 import { useRouter } from "next/navigation";
-import { useDaycares } from "@/stores/DaycareStore";
-
-const indianCities = [
-  "Mumbai",
-  "Delhi",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
-  "Kolkata",
-  "Pune",
-  "Ahmedabad",
-  "Jaipur",
-  "Lucknow",
-  "Surat",
-  "Kanpur",
-  "Nagpur",
-  "Visakhapatnam",
-  "Bhopal",
-  "Patna",
-  "Ludhiana",
-  "Agra",
-  "Nashik",
-  "Vadodara",
-];
-const { cities, loading, error } = useDaycares();
+import useUIStore from "@/stores/uiStore";
+import useAuthStore from "@/stores/AuthStore";
+import useDaycareStore from "@/stores/DaycareStore"; // Zustand store
+import AdBanner from "../Ads/AdBanner";
+import SearchBarWithSuggestions from "./SearchBarWithSuggestions";
 
 export default function Navbar() {
   const router = useRouter();
+
   const {
     isProfileOpen,
     toggleProfile,
@@ -56,9 +34,19 @@ export default function Navbar() {
     setCitySearchQuery,
     unreadCount,
   } = useUIStore();
-  const { isLoggedIn, logout, user } = useAuthStore();
+
+  const { isLoggedIn, logout } = useAuthStore();
+
+  const { cities, loading, error, fetchCities, getTotalDaycares } =
+    useDaycareStore();
+
   const cityDropdownRef = useRef(null);
   const profileDropdownRef = useRef(null);
+
+  // Fetch cities on mount
+  useEffect(() => {
+    fetchCities();
+  }, [fetchCities]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -79,22 +67,25 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeCityDropdown, closeProfile]);
-  console.log(user);
 
-  const filteredCities = indianCities.filter((city) =>
-    city.toLowerCase().includes(citySearchQuery.toLowerCase())
+
+
+  // Filtered cities for dropdown
+  const filteredCities = cities.filter((city) =>
+    city.name.toLowerCase().includes(citySearchQuery.toLowerCase())
   );
+
   const handleLogout = async () => {
     await logout();
-
     router.replace("/login");
   };
+
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <AdBanner />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Left: Logo */}
+          {/* Logo */}
           <Link href="/" className="flex-shrink-0 flex items-center">
             <Image
               src="/logo.png"
@@ -107,15 +98,18 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Search & City Selector */}
-          <div className="hidden md:flex flex-1 items-center max-w-3xl mx-8">
+
+          <div className="hidden md:flex flex-1 items-center max-w-3xl mx-8 relative">
             {/* City Selector */}
-            <div className="relative" ref={cityDropdownRef}>
+            <div className="relative z-20" ref={cityDropdownRef}>
               <button
                 onClick={toggleCityDropdown}
-                className="flex items-center space-x-2 px-4 py-2 rounded-l-full border border-gray-300 bg-gray-50 hover:bg-gray-100 transition text-gray-700 font-medium min-w-[140px]"
+                className="flex items-center space-x-2 px-4 py-2 rounded-l-full border border-gray-300 bg-gray-50 hover:bg-gray-100 transition text-gray-700 font-medium min-w-[150px] z-10"
               >
                 <MapPin size={18} className="text-indigo-600" />
-                <span className="truncate max-w-[80px]">{selectedCity}</span>
+                <span className="truncate max-w-[90px]">
+                  {selectedCity || "Select City"}
+                </span>
                 <ChevronDown size={16} className="text-gray-500" />
               </button>
 
@@ -123,10 +117,6 @@ export default function Navbar() {
                 <div className="absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                   <div className="p-2 border-b border-gray-200">
                     <div className="relative">
-                      <Search
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                        size={18}
-                      />
                       <input
                         type="text"
                         placeholder="Search cities..."
@@ -138,18 +128,25 @@ export default function Navbar() {
                     </div>
                   </div>
                   <div className="max-h-60 overflow-y-auto py-1">
-                    {filteredCities.length > 0 ? (
+                    {loading ? (
+                      <div className="px-4 py-2 text-gray-500">Loading...</div>
+                    ) : error ? (
+                      <div className="px-4 py-2 text-red-500">{error}</div>
+                    ) : filteredCities.length > 0 ? (
                       filteredCities.map((city) => (
                         <button
-                          key={city}
-                          onClick={() => setSelectedCity(city)}
+                          key={city.id}
+                          onClick={() => setSelectedCity(city.name)}
                           className={`w-full text-left px-4 py-2 hover:bg-gray-50 ${
-                            selectedCity === city
-                              ? "bg-indigo-50 text-primary-hover"
+                            selectedCity === city.name
+                              ? "bg-indigo-50 text-indigo-600"
                               : ""
                           }`}
                         >
-                          {city}
+                          {city.name}{" "}
+                          <span className="text-gray-500 text-sm">
+                            ({city.approved_daycares_count})
+                          </span>
                         </button>
                       ))
                     ) : (
@@ -163,28 +160,16 @@ export default function Navbar() {
             </div>
 
             {/* Search Input */}
-            <div className="flex-1 relative">
-              <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Search for daycares, services..."
-                className="w-full pl-11 pr-4 py-2 rounded-r-full border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+            <div className="flex-1">
+              <SearchBarWithSuggestions
+                inputClass="rounded-r-full border border-gray-300" // matching right rounded style
               />
             </div>
           </div>
 
-          {/* Right: Profile, Chat, Hamburger */}
+          {/* Right Section */}
           <div className="flex items-center space-x-3">
-            {/* Mobile Search Toggle */}
-            <button
-              onClick={toggleMobileSearch}
-              className="md:hidden p-2 text-gray-500 hover:text-indigo-600"
-            ></button>
-
-            {/* Chat Icon */}
+            {/* Chat */}
             {isLoggedIn && (
               <div className="relative">
                 <Link

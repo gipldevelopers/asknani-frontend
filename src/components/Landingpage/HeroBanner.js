@@ -1,8 +1,17 @@
-// components/HeroBanner.js
 "use client";
+
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, MapPin, Shield, Star, Clock, Search, Heart, Users, BookOpen } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Shield,
+  Star,
+  Clock,
+  Heart,
+} from "lucide-react";
 import Image from "next/image";
+import SearchBarWithSuggestions from "../Helper/SearchBarWithSuggestions";
 
 const slides = [
   {
@@ -10,11 +19,11 @@ const slides = [
     alt: "Kids playing in daycare",
   },
   {
-    img: "https://images.unsplash.com/photo-1567746455504-cb3213f8f5b8?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    img: "https://images.unsplash.com/photo-1567746455504-cb3213f8f5b8?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0",
     alt: "Teachers with children",
   },
   {
-    img: "https://images.unsplash.com/photo-1722247480078-4fffd0ab166f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    img: "https://images.unsplash.com/photo-1722247480078-4fffd0ab166f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0",
     alt: "Learning activities",
   },
 ];
@@ -31,12 +40,11 @@ export default function HeroBanner() {
   }, []);
 
   const nextSlide = () => setCurrent((prev) => (prev + 1) % slides.length);
-  const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+  const prevSlide = () =>
+    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative bg-indigo-50  overflow-hidden">
-      {/* Decorative elements */}
-
+    <section className="relative bg-indigo-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 xl:py-20 grid lg:grid-cols-12 gap-6 lg:gap-10 items-center relative z-10">
         {/* LEFT: Text Content */}
         <div className="lg:col-span-5 space-y-6 md:space-y-8">
@@ -46,40 +54,40 @@ export default function HeroBanner() {
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-              Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Perfect Daycare</span> for Your Child
+              Find the{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+                Perfect Daycare
+              </span>{" "}
+              for Your Child
             </h1>
 
             <p className="text-lg sm:text-xl text-gray-600 max-w-2xl">
-              Discover trusted providers across India with verified reviews, real-time availability, and easy bookings — all in one platform.
+              Discover trusted providers across India with verified reviews,
+              real-time availability, and easy bookings — all in one platform.
             </p>
           </div>
 
           {/* Search Bar */}
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row w-full bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200/70">
-              <div className="flex items-center flex-grow px-4 sm:px-5">
-                <MapPin className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Enter location, daycare name..."
-                  className="flex-grow px-3 sm:px-4 py-4 text-gray-700 focus:outline-none placeholder-gray-400"
-                />
-              </div>
-              <button className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 font-medium hover:opacity-90 transition-all flex items-center justify-center">
-                <Search className="h-5 w-5 mr-2" />
-                <span>Search</span>
-              </button>
-            </div>
+            <SearchBarWithSuggestions inputClass="flex-grow rounded-2xl bg-white border border-gray-200 shadow-lg" />
 
             {/* Popular searches */}
-            <div className="flex flex-wrap gap-2">
+            {/* <div className="flex flex-wrap gap-2">
               <span className="text-gray-500 text-sm">Popular:</span>
-              {["Daycare near me", "Preschool", "Baby care", "After school"].map((tag, i) => (
-                <button key={i} className="text-sm text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-full transition-colors">
+              {[
+                "Daycare near me",
+                "Preschool",
+                "Baby care",
+                "After school",
+              ].map((tag, i) => (
+                <button
+                  key={i}
+                  className="text-sm text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-full transition-colors"
+                >
                   {tag}
                 </button>
               ))}
-            </div>
+            </div> */}
           </div>
 
           {/* Trust Indicators */}
@@ -100,7 +108,9 @@ export default function HeroBanner() {
               <div className="p-2 bg-blue-100 rounded-lg">
                 <Clock className="h-5 w-5 text-blue-600" />
               </div>
-              <span className="text-sm font-medium">Real-Time Availability</span>
+              <span className="text-sm font-medium">
+                Real-Time Availability
+              </span>
             </div>
           </div>
         </div>
@@ -110,10 +120,12 @@ export default function HeroBanner() {
           {slides.map((slide, index) => (
             <div
               key={index}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${index === current ? "opacity-100 z-20" : "opacity-0 z-10"}`}
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+                index === current ? "opacity-100 z-20" : "opacity-0 z-10"
+              }`}
             >
               <Image
-              fill
+                fill
                 src={slide.img}
                 alt={slide.alt}
                 className="w-full h-full object-cover"
@@ -121,14 +133,6 @@ export default function HeroBanner() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
             </div>
           ))}
-
-          {/* Content overlay */}
-          <div className="absolute bottom-0 left-0 right-0 text-white p-6 md:p-8 z-30 bg-gradient-to-t from-black/70 to-transparent">
-            <div className="max-w-md">
-              <h3 className="text-xl md:text-2xl font-bold mb-2">Safe & Nurturing Environments</h3>
-              <p className="text-sm md:text-base opacity-90">Our partner daycares maintain the highest standards of safety and care for your little ones.</p>
-            </div>
-          </div>
 
           {/* Controls */}
           <button
@@ -152,15 +156,17 @@ export default function HeroBanner() {
               <button
                 key={index}
                 onClick={() => setCurrent(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${index === current ? "bg-white scale-125" : "bg-white/60 hover:bg-white/80"}`}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  index === current
+                    ? "bg-white scale-125"
+                    : "bg-white/60 hover:bg-white/80"
+                }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}
           </div>
         </div>
       </div>
-
-
     </section>
   );
 }

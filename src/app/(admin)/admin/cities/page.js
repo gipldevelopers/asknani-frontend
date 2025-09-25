@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createCity, getCities, getCity } from "@/lib/schemas/cityService";
+import Image from "next/image";
 
 // Define the form schema using Zod for validation
 const formSchema = z.object({
@@ -260,10 +261,12 @@ export default function CityManagementPage() {
                       </p>
                       {selectedCity.image && (
                         <div className="mt-4">
-                          <img
+                          <Image
                             src={selectedCity.image}
                             alt={selectedCity.name}
                             className="w-full max-h-48 object-contain rounded-lg"
+                            width={500}
+                            height={500}
                           />
                         </div>
                       )}

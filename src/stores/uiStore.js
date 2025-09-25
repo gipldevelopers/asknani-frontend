@@ -6,12 +6,11 @@ const useUIStore = create((set) => ({
   isMobileMenuOpen: false,
   isCityDropdownOpen: false,
   isMobileSearchOpen: false,
-  selectedCity: "New Delhi",
+  selectedCity: null,
   citySearchQuery: "",
   unreadCount: 3, // demo
 
   // 🔹 Auth State (later replace with real auth integration)
- 
 
   // 🔹 Actions
   toggleProfile: () =>
@@ -35,7 +34,6 @@ const useUIStore = create((set) => ({
   setCitySearchQuery: (query) => set({ citySearchQuery: query }),
 
   setUnreadCount: (count) => set({ unreadCount: count }),
- 
 }));
 
 export default useUIStore;
