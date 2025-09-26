@@ -38,116 +38,12 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import useAuthStore from "@/stores/AuthStore";
 import API from "@/lib/api";
 
 // --------------------------- Dummy Data ---------------------------
-const dummyDaycares = [
-  {
-    id: "1",
-    slug: "sunshine-daycare",
-    name: "Sunshine Daycare Center",
-    shortDesc:
-      "A nurturing environment for your child's growth and development",
-    rating: 4.8,
-    reviewCount: 127,
-    priceFrom: 1200,
-    location: "Mumbai",
-    address: "123 Main Street, Bandra West, Mumbai 400050",
-    phone: "+91 98765 43210",
-    images: [
-      "/placeholder-daycare-1.jpg",
-      "/placeholder-daycare-2.jpg",
-      "/placeholder-daycare-3.jpg",
-    ],
-    features: [
-      "Air Conditioned",
-      "Playground",
-      "Healthy Meals",
-      "CCTV",
-      "Educational Toys",
-      "Nap Area",
-    ],
-    staff: [
-      {
-        id: "s1",
-        name: "Priya Sharma",
-        role: "Head Caregiver",
-        bio: "10+ years of experience in child care",
-        badge: "Verified",
-      },
-      {
-        id: "s2",
-        name: "Raj Patel",
-        role: "Activity Coordinator",
-        bio: "Specialized in child development activities",
-        badge: "Certified",
-      },
-    ],
-    packages: [
-      {
-        id: "p1",
-        title: "Half Day",
-        price: 700,
-        hours: "8:30am - 1:30pm",
-        description: "Snack included",
-        popular: false,
-      },
-      {
-        id: "p2",
-        title: "Full Day",
-        price: 1200,
-        hours: "8:30am - 6:30pm",
-        description: "Lunch + Snacks",
-        popular: true,
-      },
-      {
-        id: "p3",
-        title: "Monthly",
-        price: 22000,
-        hours: "Monthly plan",
-        description: "Discounted long-term plan",
-        popular: false,
-      },
-    ],
-    safety: [
-      "CPR Certified",
-      "First Aid Trained",
-      "Background Checked",
-      "Sanitized Premises",
-    ],
-    policies: "Standard policies apply. Please inquire.",
-    reviews: [
-      {
-        id: "r1",
-        name: "Anita Verma",
-        rating: 5,
-        date: "2024-01-15",
-        text: "Wonderful staff and clean facilities. My daughter loves coming here!",
-      },
-      {
-        id: "r2",
-        name: "Rahul Mehta",
-        rating: 4,
-        date: "2024-01-10",
-        text: "Good daycare with caring staff. Would recommend to other parents.",
-      },
-    ],
-    operatingHours: {
-      weekdays: "7:00 AM - 7:00 PM",
-      weekends: "8:00 AM - 6:00 PM",
-    },
-    availability: {
-      "2024-09-03": { capacity: 6, total: 12 },
-      "2024-09-04": { capacity: 0, total: 12 },
-    },
-    mapUrl:
-      "https://www.google.com/maps/place/Gandhinagar,+Gujarat/@23.220846,72.5631459,12z/data=!3m1!4b1!4m6!3m5!1s0x395c2b987c6d6809:0xf86f06a7873e0391!8m2!3d23.2156354!4d72.6369415!16zL20vMDFkM213?authuser=0&entry=ttu&g_ep=EgoyMDI1MDkyMy4wIKXMDSoASAFQAw%3D%3D",
-  },
-];
+
 function getEmbedUrl(normalUrl) {
   try {
-    // If user pasted a Google Maps link like https://goo.gl/maps/... or https://www.google.com/maps/place/...
     if (normalUrl.includes("/maps")) {
       return normalUrl.replace("/maps", "/maps/embed");
     }
@@ -172,8 +68,10 @@ export default function DaycareDetailPage({ params }) {
   const [faved, setFaved] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [packages, setPackages] = useState(false);
 
-  const parent = useAuthStore((state) => state.user);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const images = daycare?.images || [];
 
   useEffect(() => {
     const loadData = async () => {
@@ -185,10 +83,21 @@ export default function DaycareDetailPage({ params }) {
         const fetchedDaycare = daycareRes.data.daycare;
         setDaycare(fetchedDaycare);
         setSelectedImage(fetchedDaycare.images[0]);
+        const logFootfall = async () => {
+          try {
+            const response = await API.post(
+              `/daycares/${fetchedDaycare.id}/footfall`
+            );
+            console.log("Footfall logged:", response.data);
+          } catch (error) {
+            console.error("Failed to log footfall:", error);
+          }
+        };
 
+        logFootfall();
         // 2️⃣ Fetch packages for this daycare
         const packagesRes = await API.get(
-          `/provider/packages/list?id=${fetchedDaycare.id}`
+          `/daycares/packages/list?id=${fetchedDaycare.id}`
         );
         const pkgList = packagesRes.data.packages || [];
 
@@ -198,13 +107,9 @@ export default function DaycareDetailPage({ params }) {
           pkgList.forEach((p, i) => (p.popular = i === randomIndex));
         }
         setPackages(pkgList);
-
-       
-
-        // 3️⃣ Fetch children for parent
-        const childrenRes = await API.get("/parent/children");
-        setChildren(childrenRes.data.children || []);
       } catch (err) {
+        console.log(err);
+
         setError(err.response?.data?.message || "Something went wrong");
       } finally {
         setLoading(false);
@@ -356,12 +261,28 @@ export default function DaycareDetailPage({ params }) {
           {/* Image Gallery */}
           <Card className="overflow-hidden">
             <CardContent className="p-0">
-              <div className="h-80 w-full relative bg-gradient-to-br from-blue-50 to-green-50">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Camera className="h-16 w-16 text-gray-300" />
-                  <span className="ml-2 text-gray-400">Daycare Images</span>
+              <div className="relative bg-black">
+                {/* Main Image */}
+                <div className="h-80 w-full relative overflow-hidden flex items-center justify-center">
+                  {images.length > 0 ? (
+                    <img
+                      src={
+                        process.env.NEXT_PUBLIC_BACKEND_URL +
+                        images[selectedIndex].url
+                      }
+                      alt={`Daycare image ${selectedIndex + 1}`}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
+                      <Camera className="h-16 w-16 text-gray-300" />
+                      <span className="ml-2 text-gray-400">Daycare Images</span>
+                    </div>
+                  )}
                 </div>
-                <div className="absolute right-4 top-4 flex gap-2">
+
+                {/* Buttons */}
+                <div className="absolute right-4 top-4 flex gap-2 z-10">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -379,6 +300,34 @@ export default function DaycareDetailPage({ params }) {
                   </Button>
                 </div>
               </div>
+
+              {/* Thumbnails */}
+              {images.length > 1 && (
+                <div className="flex gap-2 p-3 overflow-x-auto bg-gray-50">
+                  {images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedIndex(i)}
+                      className={`relative w-20 h-16 rounded-lg overflow-hidden border-2 ${
+                        i === selectedIndex
+                          ? "border-blue-500"
+                          : "border-transparent"
+                      }`}
+                    >
+                      <img
+                        src={process.env.NEXT_PUBLIC_BACKEND_URL + img.url}
+                        alt={`Thumbnail ${i + 1}`}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      />
+                      {img.isFeatured && (
+                        <span className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                          ★
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -563,7 +512,7 @@ export default function DaycareDetailPage({ params }) {
                         </div>
                       </div>
                       <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full">
-                        <Star className="h-4 w-4 text-amber-400" />
+                        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
                         <span className="font-semibold">{review.rating}</span>
                       </div>
                     </div>

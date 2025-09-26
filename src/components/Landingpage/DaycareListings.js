@@ -195,9 +195,7 @@ export default function DaycareListings() {
                     <MapPin size={14} className="mr-1 flex-shrink-0" />
                     <span className="line-clamp-1">{d.city}</span>
                   </div>
-                  <p className="text-sm text-gray-500 mb-3">
-                    {d.short_desc}
-                  </p>
+                  <p className="text-sm text-gray-500 mb-3">{d.short_desc}</p>
                 </div>
 
                 <div className="p-4 pt-0 mt-auto sticky bottom-0 bg-white border-t border-gray-100">
@@ -218,7 +216,9 @@ export default function DaycareListings() {
             <h3 className="text-xl font-medium text-gray-700 mb-2">
               No daycares found
             </h3>
-            <p className="text-gray-500">Try adjusting your search or filters</p>
+            <p className="text-gray-500">
+              Try adjusting your search or filters
+            </p>
           </div>
         )}
       </div>

@@ -55,13 +55,9 @@ export default function EmailVerificationPage() {
       );
 
       if (res.data?.token) {
-        // ✅ auto-login by setting token in AuthStore
         setToken(res.data.token);
-
         setStatus("success");
         toast.success("Email verified successfully!");
-
-        // Redirect after short delay
         setTimeout(() => {
           router.push("/");
         }, 1500);
