@@ -1,25 +1,23 @@
 // app/daycares/[slug]/page.js
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   MapPin,
   Star,
   Phone,
   Clock,
-  Calendar,
   Heart,
   CheckCircle,
   X,
   CalendarCheck,
-  CreditCard,
   Camera,
   User,
   MessageCircle,
   Share2,
-  ArrowUpRight,
   Loader2,
+  CreditCard,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -35,262 +33,220 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar as CalComponents } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import {
-  fetchDaycareDetails,
-  submitDaycareReview,
-  scheduleDaycareTour,
-  submitBooking,
-  fetchDaycareReviews,
-} from "@/lib/daycareApi"; // Import new API functions
+import useAuthStore from "@/stores/AuthStore";
+import API from "@/lib/api";
 
-// --------------------------- Utilities ---------------------------
-// NOTE: This utility assumes your backend is at the same origin or has public storage.
-const assetUrl = (path) =>
-  path
-    ? (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000/storage") +
-      "/storage/" +
-      path
-    : null;
-const currency = (n) => `₹${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
-
-const mapApiDataToDaycareProps = (apiData, reviews) => {
-  // Use the sample data structure as a fallback/template for fields not in API response
-  const packagesSample = [
-    {
-      id: "p1",
-      title: "Half Day",
-      price: 700,
-      hours: "8:30am - 1:30pm",
-      description: "Snack included",
-      popular: false,
-    },
-    {
-      id: "p2",
-      title: "Full Day",
-      price: 1200,
-      hours: "8:30am - 6:30pm",
-      description: "Lunch + Snacks",
-      popular: true,
-    },
-    {
-      id: "p3",
-      title: "Monthly",
-      price: 22000,
-      hours: "Monthly plan",
-      description: "Discounted long-term plan",
-      popular: false,
-    },
-  ];
-
-  return {
-    id: apiData.id,
-    slug: apiData.slug,
-    name: apiData.name || "Daycare Name Missing",
+// --------------------------- Dummy Data ---------------------------
+const dummyDaycares = [
+  {
+    id: "1",
+    slug: "sunshine-daycare",
+    name: "Sunshine Daycare Center",
     shortDesc:
-      apiData.short_desc || apiData.tagline || "No short description provided.",
-    rating: apiData.rating ? Number(apiData.rating.toFixed(1)) : 0,
-    reviewCount: reviews.length, // Dynamic count from fetched reviews
-    priceFrom: packagesSample[0].price, // Fallback to a package price for quick view
-    location: apiData.city?.name || "Unknown City",
-    address: apiData.address || "Address not provided",
-    phone: apiData.phone || "Not available",
-    images: apiData.photos.map((p) => assetUrl(p.image_path)).filter(Boolean),
-    features: apiData.facilities.map((f) => f.name),
-    staff: apiData.staff.map((s) => ({
-      id: s.id,
-      name: s.name,
-      role: s.role || "Staff Member",
-      bio: s.bio || "Experienced caregiver.",
-      badge: s.badge || "Verified",
-    })),
-    packages: packagesSample, // Hardcoded: packages logic needs its own API.
-    availability: {
-      "2025-09-03": { capacity: 6, total: 12 }, // Hardcoded: availability logic needs its own API.
-      "2025-09-04": { capacity: 0, total: 12 },
-    },
-    safety: apiData.certifications.map((c) => c.name), // Using certifications as 'safety' list
-    policies: apiData.policies || "Standard policies apply. Please inquire.",
-    reviews: reviews,
+      "A nurturing environment for your child's growth and development",
+    rating: 4.8,
+    reviewCount: 127,
+    priceFrom: 1200,
+    location: "Mumbai",
+    address: "123 Main Street, Bandra West, Mumbai 400050",
+    phone: "+91 98765 43210",
+    images: [
+      "/placeholder-daycare-1.jpg",
+      "/placeholder-daycare-2.jpg",
+      "/placeholder-daycare-3.jpg",
+    ],
+    features: [
+      "Air Conditioned",
+      "Playground",
+      "Healthy Meals",
+      "CCTV",
+      "Educational Toys",
+      "Nap Area",
+    ],
+    staff: [
+      {
+        id: "s1",
+        name: "Priya Sharma",
+        role: "Head Caregiver",
+        bio: "10+ years of experience in child care",
+        badge: "Verified",
+      },
+      {
+        id: "s2",
+        name: "Raj Patel",
+        role: "Activity Coordinator",
+        bio: "Specialized in child development activities",
+        badge: "Certified",
+      },
+    ],
+    packages: [
+      {
+        id: "p1",
+        title: "Half Day",
+        price: 700,
+        hours: "8:30am - 1:30pm",
+        description: "Snack included",
+        popular: false,
+      },
+      {
+        id: "p2",
+        title: "Full Day",
+        price: 1200,
+        hours: "8:30am - 6:30pm",
+        description: "Lunch + Snacks",
+        popular: true,
+      },
+      {
+        id: "p3",
+        title: "Monthly",
+        price: 22000,
+        hours: "Monthly plan",
+        description: "Discounted long-term plan",
+        popular: false,
+      },
+    ],
+    safety: [
+      "CPR Certified",
+      "First Aid Trained",
+      "Background Checked",
+      "Sanitized Premises",
+    ],
+    policies: "Standard policies apply. Please inquire.",
+    reviews: [
+      {
+        id: "r1",
+        name: "Anita Verma",
+        rating: 5,
+        date: "2024-01-15",
+        text: "Wonderful staff and clean facilities. My daughter loves coming here!",
+      },
+      {
+        id: "r2",
+        name: "Rahul Mehta",
+        rating: 4,
+        date: "2024-01-10",
+        text: "Good daycare with caring staff. Would recommend to other parents.",
+      },
+    ],
     operatingHours: {
-      // Hardcoded: hours logic needs its own API.
       weekdays: "7:00 AM - 7:00 PM",
       weekends: "8:00 AM - 6:00 PM",
     },
-  };
-};
+    availability: {
+      "2024-09-03": { capacity: 6, total: 12 },
+      "2024-09-04": { capacity: 0, total: 12 },
+    },
+    mapUrl:
+      "https://www.google.com/maps/place/Gandhinagar,+Gujarat/@23.220846,72.5631459,12z/data=!3m1!4b1!4m6!3m5!1s0x395c2b987c6d6809:0xf86f06a7873e0391!8m2!3d23.2156354!4d72.6369415!16zL20vMDFkM213?authuser=0&entry=ttu&g_ep=EgoyMDI1MDkyMy4wIKXMDSoASAFQAw%3D%3D",
+  },
+];
+function getEmbedUrl(normalUrl) {
+  try {
+    // If user pasted a Google Maps link like https://goo.gl/maps/... or https://www.google.com/maps/place/...
+    if (normalUrl.includes("/maps")) {
+      return normalUrl.replace("/maps", "/maps/embed");
+    }
+    return normalUrl;
+  } catch (err) {
+    console.error("Invalid Maps URL", err);
+    return "";
+  }
+}
+
+const currency = (n) => `₹${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
 // --------------------------- Main Component ---------------------------
 export default function DaycareDetailPage({ params }) {
-  const { slug } = params;
+  const { slug } = React.use(params);
   const [daycare, setDaycare] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [fetchedReviews, setFetchedReviews] = useState([]);
 
-  // Local State (Initialised after daycare data is fetched)
+  // Local State
   const [selectedImage, setSelectedImage] = useState(null);
-  const [selectedPackage, setSelectedPackage] = useState(null);
-  const [bookingDate, setBookingDate] = useState("");
-  const [childName, setChildName] = useState("");
-  const [childAge, setChildAge] = useState(2);
-  const [specialReq, setSpecialReq] = useState("");
-  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [faved, setFaved] = useState(false);
   const [showTourModal, setShowTourModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
-  const [faved, setFaved] = useState(false);
-  const [capacityInfo, setCapacityInfo] = useState({});
 
-  // Fetch Data on Load
+  const parent = useAuthStore((state) => state.user);
+
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Step 1: Fetch Daycare Details
-        const apiDetails = await fetchDaycareDetails(slug);
 
-        if (!apiDetails) {
-          setError("Daycare not found or is not approved.");
-          setLoading(false);
-          return;
-        }
+        // 1️⃣ Fetch daycare details by slug
+        const daycareRes = await API.get(`/daycares/${slug}`);
+        const fetchedDaycare = daycareRes.data.daycare;
+        setDaycare(fetchedDaycare);
+        setSelectedImage(fetchedDaycare.images[0]);
 
-        // Step 2: Fetch Reviews using the fetched ID
-        const reviews = await fetchDaycareReviews(apiDetails.id);
-        setFetchedReviews(reviews);
-
-        // Step 3: Map and set state
-        const mappedData = mapApiDataToDaycareProps(apiDetails, reviews);
-        setDaycare(mappedData);
-        setSelectedImage(mappedData.images[0]);
-        setSelectedPackage(
-          mappedData.packages.find((p) => p.popular) || mappedData.packages[0]
+        // 2️⃣ Fetch packages for this daycare
+        const packagesRes = await API.get(
+          `/provider/packages/list?id=${fetchedDaycare.id}`
         );
-        setCapacityInfo(mappedData.availability);
+        const pkgList = packagesRes.data.packages || [];
+
+        // Randomly mark one package as popular if none
+        if (!pkgList.some((p) => p.popular) && pkgList.length > 0) {
+          const randomIndex = Math.floor(Math.random() * pkgList.length);
+          pkgList.forEach((p, i) => (p.popular = i === randomIndex));
+        }
+        setPackages(pkgList);
+
+       
+
+        // 3️⃣ Fetch children for parent
+        const childrenRes = await API.get("/parent/children");
+        setChildren(childrenRes.data.children || []);
       } catch (err) {
-        setError("Failed to load daycare data. Please try again.");
-        console.error(err);
+        setError(err.response?.data?.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
     };
-    loadData();
+
+    if (slug) loadData();
   }, [slug]);
 
   // Accessibility: lock scroll when modal open
   useEffect(() => {
     document.body.style.overflow =
-      showBookingModal || showReviewModal || showTourModal ? "hidden" : "";
+      showReviewModal || showTourModal ? "hidden" : "";
     return () => (document.body.style.overflow = "");
-  }, [showBookingModal, showReviewModal, showTourModal]);
+  }, [showReviewModal, showTourModal]);
 
-  const getCapacityForDate = useCallback(
-    (dateStr) => capacityInfo[dateStr] || null,
-    [capacityInfo]
-  );
+  // Handlers
+  const submitReview = (reviewData) => {
+    const newReview = {
+      id: `r${Date.now()}`,
+      ...reviewData,
+      date: format(new Date(), "yyyy-MM-dd"),
+    };
 
-  // --- Handlers ---
-  const startBooking = async () => {
-    if (!bookingDate) {
-      alert("Please pick a date");
-      return;
-    }
-    if (!childName) {
-      alert("Please provide child's name");
-      return;
-    }
-    // Check if slots are available (simple check)
-    const capacity = getCapacityForDate(bookingDate);
-    if (capacity && capacity.capacity <= 0) {
-      alert("This date is fully booked. Please select another date.");
-      return;
-    }
-    setShowBookingModal(true);
+    setDaycare((prev) => ({
+      ...prev,
+      reviews: [newReview, ...prev.reviews],
+      reviewCount: prev.reviewCount + 1,
+    }));
+
+    setShowReviewModal(false);
+    alert("Review submitted successfully!");
   };
 
-  const confirmBooking = async () => {
-    try {
-      const bookingData = {
-        daycare_id: daycare.id,
-        package_id: selectedPackage.id,
-        booking_date: bookingDate,
-        child_name: childName,
-        child_age: childAge,
-        special_requirements: specialReq,
-        // Assuming user is authenticated and ID is passed implicitly via API interceptor
-      };
-
-      // API call to process booking (inferred function)
-      await submitBooking(bookingData);
-
-      setShowBookingModal(false);
-      alert("Booking confirmed! A receipt has been sent to your email.");
-
-      // Optimistically update local capacity
-      setCapacityInfo((p) => {
-        const next = { ...p };
-        if (!next[bookingDate]) next[bookingDate] = { capacity: 0, total: 12 };
-        next[bookingDate].capacity = Math.max(
-          0,
-          next[bookingDate].capacity - 1
-        );
-        return next;
-      });
-    } catch (error) {
-      setShowBookingModal(false);
-      alert("Failed to confirm booking. Please try again or contact support.");
-    }
+  const scheduleTour = (tourData) => {
+    setShowTourModal(false);
+    alert(
+      `Tour scheduled for ${tourData.date} at ${tourData.time}! We'll send a confirmation shortly.`
+    );
   };
 
-  const submitReview = async (r) => {
-    try {
-      const newReview = await submitDaycareReview(daycare.id, r);
-      // Optimistically add the new review to the list
-      setFetchedReviews((s) => [newReview, ...s]);
-      setDaycare((p) => ({
-        ...p,
-        reviewCount: p.reviewCount + 1,
-        // Note: Real rating should be recalculated from API or on the backend
-      }));
-      setShowReviewModal(false);
-      alert("Review submitted successfully!");
-    } catch (error) {
-      alert("Failed to submit review. You might need to be logged in.");
-    }
-  };
-
-  const scheduleTour = async (tourData) => {
-    try {
-      await scheduleDaycareTour({
-        daycare_id: daycare.id,
-        ...tourData,
-      });
-      setShowTourModal(false);
-      alert(
-        `Tour scheduled for ${tourData.date} at ${tourData.time}! We'll send a confirmation shortly.`
-      );
-    } catch (error) {
-      alert("Failed to schedule tour. Please try again.");
-    }
-  };
-
-  // --- Render Logic ---
-
+  // Render Logic
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -300,41 +256,41 @@ export default function DaycareDetailPage({ params }) {
     );
   }
 
-  if (error) {
+  if (error || !daycare) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
         <X className="h-12 w-12 text-red-500 mb-4" />
-        <h1 className="text-xl font-semibold mb-2">Error Loading Page</h1>
-        <p className="text-gray-600">{error}</p>
-        <Button onClick={() => window.location.reload()} className="mt-6">
-          Try Again
+        <h1 className="text-xl font-semibold mb-2">Daycare Not Found</h1>
+        <p className="text-gray-600">
+          {error || "The daycare you're looking for doesn't exist."}
+        </p>
+        <Button asChild className="mt-6">
+          <Link href="/daycares">Browse Daycares</Link>
         </Button>
       </div>
     );
   }
 
-  // Use the mapped and non-null daycare object
   const d = daycare;
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex-1">
-            <h1 className="text-base sm:text-lg font-semibold truncate">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
               {d.name}
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
+            <p className="text-sm text-gray-600 mt-1 line-clamp-2">
               {d.shortDesc}
             </p>
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
-              <div className="flex items-center gap-1">
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+              <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full">
                 <Star className="h-4 w-4 text-amber-400" />
-                <span className="font-medium">{d.rating.toFixed(1)}</span>
-                <span>({d.reviewCount})</span>
+                <span className="font-semibold">{d.rating.toFixed(1)}</span>
+                <span>({d.reviewCount} reviews)</span>
               </div>
-              <span className="hidden sm:inline">•</span>
               <div className="flex items-center gap-1">
                 <MapPin className="h-4 w-4" />
                 <span className="truncate">{d.location}</span>
@@ -342,19 +298,23 @@ export default function DaycareDetailPage({ params }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             <Button
               variant="outline"
               size="icon"
               onClick={() => setFaved((s) => !s)}
-              className={faved ? "text-red-500" : "text-gray-600"}
+              className={cn(
+                "h-10 w-10",
+                faved ? "text-red-500 border-red-200" : "text-gray-600"
+              )}
             >
-              <Heart className="h-5 w-5" />
+              <Heart className={cn("h-5 w-5", faved && "fill-current")} />
             </Button>
+
             <Popover>
               <PopoverTrigger asChild>
-                <Button className="bg-primary hover:bg-primary/90">
-                  Book a Visit
+                <Button className="bg-primary hover:bg-primary/90 px-6">
+                  Book Now
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -362,7 +322,7 @@ export default function DaycareDetailPage({ params }) {
                   <div className="space-y-2">
                     <h4 className="font-medium leading-none">Quick Actions</h4>
                     <p className="text-sm text-muted-foreground">
-                      Choose how you&apos;d like to proceed
+                      Choose how you'd like to proceed
                     </p>
                   </div>
                   <div className="grid gap-2">
@@ -370,8 +330,8 @@ export default function DaycareDetailPage({ params }) {
                       <CalendarCheck className="w-4 h-4 mr-2" />
                       Schedule a Tour
                     </Button>
-                    <Button variant="outline" asChild>
-                      <Link href="#booking-section">
+                    <Button asChild variant="outline">
+                      <Link href={`/booking/${d.slug}`}>
                         <CreditCard className="w-4 h-4 mr-2" />
                         Book & Pay Now
                       </Link>
@@ -390,96 +350,94 @@ export default function DaycareDetailPage({ params }) {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column */}
-        <section className="lg:col-span-2 space-y-6">
+      <main className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Main Content */}
+        <section className="lg:col-span-2 space-y-8">
           {/* Image Gallery */}
-          <Card>
+          <Card className="overflow-hidden">
             <CardContent className="p-0">
-              <div className="h-64 w-full relative">
-                <Image
-                  fill
-                  src={selectedImage || d.images[0] || "/placeholder.png"}
-                  alt="Daycare gallery"
-                  className="object-cover"
-                />
-                <div className="absolute right-3 top-3 flex gap-2">
-                  <Button variant="secondary" size="sm">
-                    Virtual tour
+              <div className="h-80 w-full relative bg-gradient-to-br from-blue-50 to-green-50">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Camera className="h-16 w-16 text-gray-300" />
+                  <span className="ml-2 text-gray-400">Daycare Images</span>
+                </div>
+                <div className="absolute right-4 top-4 flex gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="backdrop-blur-sm"
+                  >
+                    Virtual Tour
                   </Button>
-                  <Button variant="secondary" size="sm">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="backdrop-blur-sm"
+                  >
                     <Share2 className="w-4 h-4 mr-1" />
                     Share
                   </Button>
                 </div>
-              </div>
-              <div className="p-3 border-t flex gap-2 overflow-x-auto">
-                {d.images.map((img, index) => (
-                  <Button
-                    key={img}
-                    variant="ghost"
-                    onClick={() => setSelectedImage(img)}
-                    className={cn(
-                      "h-20 w-28 p-0 overflow-hidden rounded-md",
-                      selectedImage === img && "ring-2 ring-primary"
-                    )}
-                  >
-                    <Image
-                      alt={`Gallery image ${index + 1}`}
-                      width={112}
-                      height={80}
-                      src={img}
-                      className="object-cover"
-                    />
-                  </Button>
-                ))}
               </div>
             </CardContent>
           </Card>
 
           {/* Overview Card */}
           <Card>
-            <CardHeader>
-              <CardTitle>Overview</CardTitle>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl">Overview</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-gray-700">
-                {d.shortDesc} — {d.address}.
+            <CardContent className="space-y-6">
+              <p className="text-gray-700 leading-relaxed">
+                {d.shortDesc} Located at {d.address}. We provide a safe,
+                nurturing environment where children can learn, play, and grow
+                under the care of our experienced staff.
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
                   <div>
-                    <div className="text-sm font-medium">Safety & Security</div>
-                    <div className="text-xs text-gray-600 mt-1">
-                      {d.safety.length > 0
-                        ? d.safety.join(" • ")
-                        : "Safety information not provided"}
+                    <div className="font-semibold text-gray-900">
+                      Safety & Security
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {d.safety.join(" • ")}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <User className="h-5 w-5 text-primary mt-0.5" />
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <User className="h-5 w-5 text-blue-600" />
+                  </div>
                   <div>
-                    <div className="text-sm font-medium">Qualified Staff</div>
-                    <div className="text-xs text-gray-600 mt-1">
-                      {d.staff.length} background-checked caregivers
+                    <div className="font-semibold text-gray-900">
+                      Qualified Staff
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      {d.staff.length} background-checked caregivers with
+                      certifications
                     </div>
                   </div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-sm font-medium mb-3">
+                <h3 className="font-semibold text-gray-900 mb-4">
                   Facilities & Amenities
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {d.features.map((feature) => (
-                    <Badge key={feature} variant="secondary">
-                      {feature}
-                    </Badge>
+                    <div
+                      key={feature}
+                      className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
+                    >
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -488,31 +446,36 @@ export default function DaycareDetailPage({ params }) {
 
           {/* Staff Card */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Meet the Team</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
+              <CardTitle className="text-xl">Meet Our Team</CardTitle>
               <Button variant="ghost" size="sm">
-                View all
+                View All
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {d.staff.map((staff) => (
-                  <div key={staff.id} className="flex gap-3 items-start">
-                    <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-medium">
+                  <div
+                    key={staff.id}
+                    className="flex gap-4 items-start p-4 bg-gray-50 rounded-lg"
+                  >
+                    <div className="h-14 w-14 rounded-full bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center text-blue-600 font-semibold text-lg">
                       {staff.name
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium">{staff.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {staff.role} •{" "}
-                        <Badge variant="outline" className="text-xs">
+                      <div className="font-semibold text-gray-900">
+                        {staff.name}
+                      </div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        {staff.role} •
+                        <Badge variant="secondary" className="ml-2 text-xs">
                           {staff.badge}
                         </Badge>
                       </div>
-                      <p className="text-xs text-gray-600 mt-1">{staff.bio}</p>
+                      <p className="text-sm text-gray-700">{staff.bio}</p>
                     </div>
                   </div>
                 ))}
@@ -520,205 +483,95 @@ export default function DaycareDetailPage({ params }) {
             </CardContent>
           </Card>
 
-          {/* Booking Section */}
-          <Card id="booking-section">
-            <CardHeader>
-              <CardTitle>Book Your Visit</CardTitle>
+          {/* Quick Booking Card */}
+          <Card className="bg-gradient-to-r from-blue-50 to-green-50 border-blue-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl">Ready to Get Started?</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Package Selection */}
-              <div>
-                <Label className="text-base font-medium">
-                  Select a Package
-                </Label>
-                <RadioGroup
-                  value={selectedPackage?.id}
-                  onValueChange={(value) => {
-                    const pkg = d.packages.find((p) => p.id === value);
-                    setSelectedPackage(pkg);
-                  }}
-                  className="grid gap-3 mt-3"
-                >
-                  {d.packages.map((pkg) => (
-                    <Label
-                      key={pkg.id}
-                      className={cn(
-                        "flex items-center justify-between rounded-lg border-2 p-4 cursor-pointer",
-                        selectedPackage?.id === pkg.id
-                          ? "border-primary bg-primary/5"
-                          : "border-muted"
-                      )}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <RadioGroupItem value={pkg.id} />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium flex items-center gap-2">
-                            {pkg.title}
-                            {pkg.popular && (
-                              <Badge variant="default" className="text-xs">
-                                Popular
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {pkg.hours} • {pkg.description}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-semibold">
-                          {currency(pkg.price)}
-                        </div>
-                      </div>
-                    </Label>
-                  ))}
-                </RadioGroup>
-              </div>
+            <CardContent className="space-y-4">
+              <p className="text-gray-700">
+                Choose from our flexible packages designed to meet your family's
+                needs.
+              </p>
 
-              {/* Date Selection */}
-              <div>
-                <Label htmlFor="booking-date" className="text-base font-medium">
-                  Select Date
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal mt-3",
-                        !bookingDate && "text-muted-foreground"
-                      )}
-                    >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {bookingDate
-                        ? format(new Date(bookingDate), "PPP")
-                        : "Pick a date"}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {d.packages.map((pkg) => (
+                  <div
+                    key={pkg.id}
+                    className={cn(
+                      "border rounded-lg p-4 transition-all hover:shadow-md",
+                      pkg.popular
+                        ? "border-primary border-2 bg-white"
+                        : "border-gray-200 bg-white"
+                    )}
+                  >
+                    {pkg.popular && (
+                      <Badge className="mb-2 bg-primary">Most Popular</Badge>
+                    )}
+                    <div className="font-semibold text-gray-900">
+                      {pkg.title}
+                    </div>
+                    <div className="text-2xl font-bold text-primary my-2">
+                      {currency(pkg.price)}
+                    </div>
+                    <div className="text-sm text-gray-600 mb-3">
+                      {pkg.hours}
+                      <br />
+                      {pkg.description}
+                    </div>
+                    <Button asChild className="w-full" size="sm">
+                      <Link href={`/booking/${d.slug}?package=${pkg.id}`}>
+                        Select Package
+                      </Link>
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <CalComponents
-                      mode="single"
-                      selected={bookingDate ? new Date(bookingDate) : undefined}
-                      onSelect={(date) =>
-                        setBookingDate(date ? format(date, "yyyy-MM-dd") : "")
-                      }
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                {bookingDate && (
-                  <div className="mt-2 text-sm">
-                    <CapacityDisplay
-                      capacity={getCapacityForDate(bookingDate)}
-                    />
                   </div>
-                )}
+                ))}
               </div>
-
-              {/* Child Information */}
-              <div className="grid gap-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="child-name">Child&apos;s Name</Label>
-                    <Input
-                      id="child-name"
-                      placeholder="Enter child's name"
-                      value={childName}
-                      onChange={(e) => setChildName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="child-age">Child&apos;s Age</Label>
-                    <Select
-                      value={childAge.toString()}
-                      onValueChange={(value) => setChildAge(Number(value))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select age" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array.from({ length: 7 }, (_, i) => i).map((age) => (
-                          <SelectItem key={age} value={age.toString()}>
-                            {age === 0
-                              ? "Under 1 year"
-                              : `${age} year${age !== 1 ? "s" : ""}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="special-requirements">
-                    Special Requirements
-                  </Label>
-                  <Textarea
-                    id="special-requirements"
-                    placeholder="Any allergies, medications, or special notes..."
-                    value={specialReq}
-                    onChange={(e) => setSpecialReq(e.target.value)}
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <Button
-                onClick={startBooking}
-                className="w-full"
-                size="lg"
-                disabled={!selectedPackage || !bookingDate || !childName}
-              >
-                Continue to Payment
-              </Button>
             </CardContent>
           </Card>
 
           {/* Reviews Card */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Parent Reviews</CardTitle>
-              <Button variant="ghost" onClick={() => setShowReviewModal(true)}>
+            <CardHeader className="flex flex-row items-center justify-between pb-4">
+              <CardTitle className="text-xl">Parent Reviews</CardTitle>
+              <Button
+                variant="outline"
+                onClick={() => setShowReviewModal(true)}
+              >
                 Write a Review
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {fetchedReviews.map((review) => (
-                  <div key={review.id} className="rounded-lg border p-4">
-                    <div className="flex items-center justify-between mb-2">
+              <div className="space-y-6">
+                {d.reviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="border-b pb-6 last:border-0 last:pb-0"
+                  >
+                    <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                          {review.name ? review.name[0] : "U"}
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center font-semibold text-blue-600">
+                          {review.name[0]}
                         </div>
                         <div>
-                          <div className="font-medium text-sm">
-                            {review.name || "Anonymous Parent"}
+                          <div className="font-semibold text-gray-900">
+                            {review.name}
                           </div>
-                          <div className="text-xs text-muted-foreground">
-                            {review.date
-                              ? format(new Date(review.date), "yyyy-MM-dd")
-                              : "Date Unknown"}
+                          <div className="text-sm text-gray-500">
+                            {format(new Date(review.date), "MMMM d, yyyy")}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full">
                         <Star className="h-4 w-4 text-amber-400" />
-                        <span className="font-medium text-sm">
-                          {review.rating}
-                        </span>
+                        <span className="font-semibold">{review.rating}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-700">{review.text}</p>
+                    <p className="text-gray-700 leading-relaxed">
+                      {review.text}
+                    </p>
                   </div>
                 ))}
-                {fetchedReviews.length === 0 && (
-                  <p className="text-sm text-muted-foreground">
-                    No reviews yet. Be the first to share your experience!
-                  </p>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -726,41 +579,42 @@ export default function DaycareDetailPage({ params }) {
 
         {/* Right Sidebar */}
         <aside className="lg:col-span-1">
-          <div className="sticky top-20 space-y-4">
-            {" "}
-            {/* Adjusted top for sticky header */}
+          <div className="sticky top-24 space-y-6">
             {/* Quick Info Card */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-4">
+            <Card className="bg-white shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-6">
                   <div>
-                    <div className="text-sm text-muted-foreground">
-                      Starting from
-                    </div>
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-sm text-gray-600">Starting from</div>
+                    <div className="text-3xl font-bold text-primary">
                       {currency(d.priceFrom)}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="flex items-center gap-1 text-sm">
+                    <div className="flex items-center gap-1 text-sm bg-amber-50 px-2 py-1 rounded-full">
                       <Star className="h-4 w-4 text-amber-400" />
-                      <span className="font-medium">{d.rating}</span>
-                      <span className="text-muted-foreground">
-                        ({d.reviewCount})
-                      </span>
+                      <span className="font-semibold">{d.rating}</span>
+                      <span className="text-gray-600">({d.reviewCount})</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Button
                     className="w-full"
                     onClick={() => setShowTourModal(true)}
                   >
+                    <CalendarCheck className="w-4 h-4 mr-2" />
                     Schedule a Tour
                   </Button>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href={`/booking/${d.slug}`}>Book & Pay Now</Link>
+                  </Button>
                   <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/chats/daycare/${d.id}`}>Message Daycare</Link>
+                    <Link href={`/chats/daycare/${d.id}`}>
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      Message Daycare
+                    </Link>
                   </Button>
                   <Button variant="outline" className="w-full" asChild>
                     <a href={`tel:${d.phone}`}>
@@ -771,63 +625,78 @@ export default function DaycareDetailPage({ params }) {
                 </div>
               </CardContent>
             </Card>
+
             {/* Operating Hours */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Operating Hours</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Operating Hours
+                </CardTitle>
               </CardHeader>
-              <CardContent className="text-sm">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Weekdays</span>
-                    <span className="font-medium">
-                      {d.operatingHours.weekdays}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Weekends</span>
-                    <span className="font-medium">
-                      {d.operatingHours.weekends}
-                    </span>
-                  </div>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between items-center py-2 border-b">
+                  <span className="text-gray-600">Weekdays</span>
+                  <span className="font-semibold">
+                    {d.operatingHours.weekdays}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600">Weekends</span>
+                  <span className="font-semibold">
+                    {d.operatingHours.weekends}
+                  </span>
                 </div>
               </CardContent>
             </Card>
+
             {/* Safety Card */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
                   Safety & Certifications
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm">
+                <ul className="space-y-3">
                   {d.safety.map((item) => (
-                    <li key={item} className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span>{item}</span>
+                    <li key={item} className="flex items-center gap-3">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span className="text-sm text-gray-700">{item}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
             </Card>
+
             {/* Location Card */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Location</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Location
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                   {d.address}
                 </p>
-                <div className="h-32 bg-muted rounded-md flex items-center justify-center mb-3">
-                  <span className="text-sm text-muted-foreground">
-                    Map View
-                  </span>
+                <div className="h-40 bg-gradient-to-br from-blue-100 to-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <iframe
+                    src={getEmbedUrl(d.mapUrl)} // 👈 user’s normal URL converted to embed
+                    width="400"
+                    height="160"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
                 </div>
-                <Button variant="outline" className="w-full" size="sm">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Open in Maps
+                <Button variant="outline" className="w-full" size="sm" asChild>
+                  <a href={d.mapUrl} target="_blank" rel="noopener noreferrer">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Open in Maps
+                  </a>
                 </Button>
               </CardContent>
             </Card>
@@ -835,30 +704,13 @@ export default function DaycareDetailPage({ params }) {
         </aside>
       </main>
 
-      {/* Booking Confirmation Modal */}
-      {d && selectedPackage && (
-        <BookingModal
-          open={showBookingModal}
-          onOpenChange={setShowBookingModal}
-          daycare={d}
-          selectedPackage={selectedPackage}
-          bookingDate={bookingDate}
-          childName={childName}
-          childAge={childAge}
-          specialReq={specialReq}
-          onConfirm={confirmBooking}
-        />
-      )}
-
-      {/* Schedule Tour Modal */}
-      {d && (
-        <TourModal
-          open={showTourModal}
-          onOpenChange={setShowTourModal}
-          daycare={d}
-          onSchedule={scheduleTour}
-        />
-      )}
+      {/* Tour Modal */}
+      <TourModal
+        open={showTourModal}
+        onOpenChange={setShowTourModal}
+        daycare={d}
+        onSchedule={scheduleTour}
+      />
 
       {/* Review Modal */}
       <ReviewModal
@@ -870,125 +722,7 @@ export default function DaycareDetailPage({ params }) {
   );
 }
 
-// --------------------------- Capacity Display Component ---------------------------
-// (Keep this component as is)
-function CapacityDisplay({ capacity }) {
-  if (!capacity) {
-    return (
-      <div className="text-muted-foreground">
-        No availability data for this date
-      </div>
-    );
-  }
-
-  const isAvailable = capacity.capacity > 0;
-  const percentage = (capacity.capacity / capacity.total) * 100;
-
-  return (
-    <div className="space-y-2">
-      <div className="flex justify-between items-center">
-        <span className="font-medium">
-          Capacity: {capacity.capacity}/{capacity.total}
-        </span>
-        <Badge variant={isAvailable ? "default" : "destructive"}>
-          {isAvailable ? "Slots Available" : "Fully Booked"}
-        </Badge>
-      </div>
-      <div className="w-full bg-muted rounded-full h-2">
-        <div
-          className={cn(
-            "h-2 rounded-full transition-all",
-            percentage > 50
-              ? "bg-green-500"
-              : percentage > 20
-              ? "bg-amber-500"
-              : "bg-red-500"
-          )}
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-// --------------------------- Booking Modal Component ---------------------------
-// (Keep this component as is)
-function BookingModal({
-  open,
-  onOpenChange,
-  daycare,
-  selectedPackage,
-  bookingDate,
-  childName,
-  childAge,
-  specialReq,
-  onConfirm,
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Confirm Booking</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="grid gap-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Daycare</span>
-              <span className="text-sm font-medium">{daycare.name}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Package</span>
-              <span className="text-sm font-medium">
-                {selectedPackage.title} - {currency(selectedPackage.price)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Date</span>
-              <span className="text-sm font-medium">
-                {bookingDate
-                  ? format(new Date(bookingDate), "PPP")
-                  : "Not selected"}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-sm text-muted-foreground">Child</span>
-              <span className="text-sm font-medium">
-                {childName} ({childAge} {childAge === 1 ? "year" : "years"})
-              </span>
-            </div>
-            {specialReq && (
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Notes</span>
-                <span className="text-sm font-medium">{specialReq}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="border-t pt-4">
-            <div className="flex justify-between items-center font-semibold">
-              <span>Total Amount</span>
-              <span>{currency(selectedPackage.price)}</span>
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={onConfirm}>
-            <CreditCard className="w-4 h-4 mr-2" />
-            Pay & Confirm
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 // --------------------------- Tour Modal Component ---------------------------
-// (Keep this component as is)
 function TourModal({ open, onOpenChange, daycare, onSchedule }) {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -1006,78 +740,51 @@ function TourModal({ open, onOpenChange, daycare, onSchedule }) {
     onSchedule({ date, time, name, phone, notes });
   };
 
-  // Use useEffect to reset state when modal opens/closes
-  useEffect(() => {
-    if (!open) {
-      setDate("");
-      setTime("");
-      setName("");
-      setPhone("");
-      setNotes("");
-    }
-  }, [open]);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Schedule a Tour</DialogTitle>
+          <DialogTitle>Schedule a Tour at {daycare?.name}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="tour-date">Date *</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    {date ? format(new Date(date), "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <CalComponents
-                    mode="single"
-                    selected={date ? new Date(date) : undefined}
-                    onSelect={(selectedDate) =>
-                      setDate(
-                        selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""
-                      )
-                    }
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+              <input
+                type="date"
+                id="tour-date"
+                className="w-full p-2 border rounded-md"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                min={new Date().toISOString().split("T")[0]}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="tour-time">Time *</Label>
-              <Select value={time} onValueChange={setTime}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select time" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableTimes.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select
+                id="tour-time"
+                className="w-full p-2 border rounded-md"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+              >
+                <option value="">Select time</option>
+                {availableTimes.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="tour-name">Your Name *</Label>
-            <Input
+            <input
               id="tour-name"
+              type="text"
+              className="w-full p-2 border rounded-md"
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -1086,8 +793,10 @@ function TourModal({ open, onOpenChange, daycare, onSchedule }) {
 
           <div className="space-y-2">
             <Label htmlFor="tour-phone">Phone Number *</Label>
-            <Input
+            <input
               id="tour-phone"
+              type="tel"
+              className="w-full p-2 border rounded-md"
               placeholder="Enter your phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
@@ -1096,8 +805,9 @@ function TourModal({ open, onOpenChange, daycare, onSchedule }) {
 
           <div className="space-y-2">
             <Label htmlFor="tour-notes">Additional Notes</Label>
-            <Textarea
+            <textarea
               id="tour-notes"
+              className="w-full p-2 border rounded-md"
               placeholder="Any specific questions or requirements..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -1124,7 +834,6 @@ function TourModal({ open, onOpenChange, daycare, onSchedule }) {
 }
 
 // --------------------------- Review Modal Component ---------------------------
-// (Keep this component as is)
 function ReviewModal({ open, onOpenChange, onSubmit }) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -1139,21 +848,8 @@ function ReviewModal({ open, onOpenChange, onSubmit }) {
       name: name.trim(),
       rating,
       text: comment.trim(),
-      // The date will be set on the server based on the API helper logic
     });
-    setName("");
-    setComment("");
-    setRating(5);
   };
-
-  // Use useEffect to reset state when modal opens/closes
-  useEffect(() => {
-    if (!open) {
-      setName("");
-      setComment("");
-      setRating(5);
-    }
-  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -1164,9 +860,11 @@ function ReviewModal({ open, onOpenChange, onSubmit }) {
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="review-name">Your Name</Label>
-            <Input
+            <Label htmlFor="review-name">Your Name *</Label>
+            <input
               id="review-name"
+              type="text"
+              className="w-full p-2 border rounded-md"
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -1174,34 +872,33 @@ function ReviewModal({ open, onOpenChange, onSubmit }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Rating</Label>
+            <Label>Rating *</Label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
-                <Button
+                <button
                   key={star}
                   type="button"
-                  variant="ghost"
-                  size="sm"
                   onClick={() => setRating(star)}
-                  className="p-1 h-auto"
+                  className="p-1"
                 >
                   <Star
                     className={cn(
-                      "h-6 w-6",
+                      "h-8 w-8 transition-colors",
                       star <= rating
                         ? "text-amber-400 fill-amber-400"
                         : "text-gray-300"
                     )}
                   />
-                </Button>
+                </button>
               ))}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="review-comment">Your Review</Label>
-            <Textarea
+            <Label htmlFor="review-comment">Your Review *</Label>
+            <textarea
               id="review-comment"
+              className="w-full p-2 border rounded-md"
               placeholder="Share your experience..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}

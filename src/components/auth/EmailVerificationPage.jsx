@@ -51,7 +51,7 @@ export default function EmailVerificationPage() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email?token=${token}&email=${email}`
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-email?token=${token}`
       );
 
       if (res.data?.token) {
