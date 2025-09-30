@@ -100,20 +100,20 @@ export default function MyBookingsPage() {
                   <div className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-start space-x-4">
-                        <Image
+                        {/* <Image
                           width={16}
                           height={16}
-                          src={booking.image}
-                          alt={booking.daycareName}
+                          src={booking.image || "https://placehold.co/400x250"}
+                          alt={booking.daycareName || "Daycare"}
                           className="h-16 w-16 rounded-lg object-cover"
-                        />
+                        /> */}
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900">
-                            {booking.daycareName}
+                            {booking.daycareName || "-"}
                           </h3>
                           <div className="flex items-center text-sm text-gray-500 mt-1">
                             <MapPin className="h-4 w-4 mr-1" />
-                            <span>{booking.address}</span>
+                            <span>{booking.address || "-"}</span>
                           </div>
                           <div className="flex items-center mt-2">
                             <div className="flex items-center text-sm font-medium">
@@ -132,15 +132,16 @@ export default function MyBookingsPage() {
                                 {getStatusText(booking.status)}
                               </span>
                             </div>
-                            
                           </div>
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-gray-900">
-                          ₹{booking.price}
+                          ₹{booking.price ?? "0"}
                         </div>
-                        <div className="text-sm text-gray-500">for 1 day</div>
+                        <div className="text-sm text-gray-500">
+                          for {booking.daysLeft + 1} day(s)
+                        </div>
                       </div>
                     </div>
 
@@ -152,11 +153,19 @@ export default function MyBookingsPage() {
                         </div>
                         <div className="flex items-center">
                           <Clock className="h-4 w-4 mr-2" />
-                          <span>{booking.time}</span>
+                          <span>
+                            {booking.time && booking.time !== " - "
+                              ? booking.time
+                              : "N/A"}
+                          </span>
                         </div>
                         <div className="text-gray-600">
                           <span className="font-medium">Child:</span>{" "}
-                          {booking.childName}
+                          {booking.childName || "-"}
+                        </div>
+                           <div className="text-gray-600">
+                          <span className="font-medium">Booking Code:</span>{" "}
+                          {booking.bookingCode || "-"}
                         </div>
                       </div>
                     </div>

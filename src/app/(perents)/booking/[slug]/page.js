@@ -1,8 +1,8 @@
-// app/booking/[slug]/page.js
+// app/(parents)/daycares/[slug]/page.js
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect, use } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -15,13 +15,11 @@ import {
   Plus,
   Trash2,
   Clock,
-  Users,
   Baby,
   Phone,
-  Mail,
   Shield,
-  QrCode,
   Smartphone,
+  QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,140 +44,184 @@ import {
 } from "@/components/ui/dialog";
 import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
+import AddChildPopover from "@/components/Bookings/AddChild";
+import toast from "react-hot-toast";
+import API from "@/lib/api";
 
-// Dummy data
-const dummyDaycares = [
-  {
-    id: "1",
-    slug: "sunshine-daycare",
-    name: "Sunshine Daycare Center",
-    rating: 4.8,
-    reviewCount: 127,
-    location: "Mumbai",
-    address: "123 Main Street, Bandra West, Mumbai 400050",
-    phone: "+91 98765 43210",
-    images: ["/placeholder-daycare-1.jpg"],
-    packages: [
-      {
-        id: "p1",
-        title: "Half Day",
-        price: 700,
-        hours: "8:30am - 1:30pm",
-        description: "Snack included",
-        popular: false,
-        duration: "5 hours",
-      },
-      {
-        id: "p2",
-        title: "Full Day",
-        price: 1200,
-        hours: "8:30am - 6:30pm",
-        description: "Lunch + Snacks",
-        popular: true,
-        duration: "10 hours",
-      },
-      {
-        id: "p3",
-        title: "Monthly",
-        price: 22000,
-        hours: "Monthly plan",
-        description: "Discounted long-term plan",
-        popular: false,
-        duration: "1 month",
-      },
-    ],
-  },
-];
-
-const currency = (n) => `₹${String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+// Currency formatter
+const currency = (amount) => {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
 
 export default function BookingPage({ params }) {
-  const { slug } = params;
+  const slug = React.use(params).slug;
+
   const searchParams = useSearchParams();
+  const router = useRouter();
   const packageId = searchParams.get("package");
 
+  // State variables
   const [daycare, setDaycare] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Booking form state
   const [selectedPackage, setSelectedPackage] = useState(null);
-  const [children, setChildren] = useState([]);
-  const [selectedChild, setSelectedChild] = useState(null);
-  const [showAddChild, setShowAddChild] = useState(false);
-  const [newChild, setNewChild] = useState({
-    name: "",
-    age: 2,
-    gender: "male",
-    allergies: "",
-    specialNeeds: "",
-  });
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedChild, setSelectedChild] = useState("");
+
+  // Parent information - initialize with empty strings instead of undefined
   const [parentInfo, setParentInfo] = useState({
     name: "",
     email: "",
     phone: "",
     emergencyContact: "",
     relationship: "Parent",
+    full_name: "", // Added this field to match your input
   });
-  const [bookingDate, setBookingDate] = useState("");
+
+  // Children management
+  const [children, setChildren] = useState([]);
+  const [showAddChild, setShowAddChild] = useState(false);
+  const [newChild, setNewChild] = useState({
+    name: "",
+    age: 1,
+    gender: "male",
+    allergies: "",
+    specialNeeds: "",
+  });
+
+  // Booking flow
   const [specialReq, setSpecialReq] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("upi");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-
-  // Initialize with sample data
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [upiUrl, setUpiUrl] = useState(null);
+  const [upiID, setUpiID] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [bookingCode, setBookingCode] = useState(null);
+  const [bookingId, setBookingId] = useState(null);
+  // Fetch daycare details by slug
   useEffect(() => {
-    const foundDaycare = dummyDaycares.find((d) => d.slug === slug);
-    if (foundDaycare) {
-      setDaycare(foundDaycare);
-      const pkg = packageId
-        ? foundDaycare.packages.find((p) => p.id === packageId)
-        : foundDaycare.packages.find((p) => p.popular) ||
-          foundDaycare.packages[0];
-      setSelectedPackage(pkg);
+    const fetchDaycare = async () => {
+      try {
+        setLoading(true);
+        const res = await API.get(`/daycares/${slug}`);
+        const daycareData = res.data.daycare;
+        setDaycare(daycareData);
+
+        // Set default package if packageId is provided in URL
+        if (packageId && daycareData.packages) {
+          const defaultPackage = daycareData.packages.find(
+            (pkg) => pkg.id === packageId
+          );
+          if (defaultPackage) {
+            setSelectedPackage(defaultPackage);
+          } else if (daycareData.packages && daycareData.packages.length > 0) {
+            // Fallback to first package if packageId not found
+            setSelectedPackage(daycareData.packages[0]);
+          }
+        } else if (daycareData.packages && daycareData.packages.length > 0) {
+          // Set first package as default
+          setSelectedPackage(daycareData.packages[0]);
+        }
+
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching daycare:", err);
+        setError("Failed to load daycare details. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchDaycare();
     }
-
-    // Set default children
-    setChildren([
-      {
-        id: "1",
-        name: "Aarav Sharma",
-        age: 3,
-        gender: "male",
-        allergies: "None",
-        specialNeeds: "",
-      },
-      {
-        id: "2",
-        name: "Anaya Patel",
-        age: 2,
-        gender: "female",
-        allergies: "Dairy",
-        specialNeeds: "",
-      },
-    ]);
-
-    // Set default parent info
-    setParentInfo({
-      name: "Rahul Sharma",
-      email: "rahul.sharma@example.com",
-      phone: "+91 98765 43210",
-      emergencyContact: "+91 98765 43211",
-      relationship: "Father",
-    });
-
-    // Set default booking date (tomorrow)
-    setBookingDate(format(addDays(new Date(), 1), "yyyy-MM-dd"));
   }, [slug, packageId]);
 
-  const handleAddChild = () => {
-    if (newChild.name.trim()) {
-      const child = {
-        id: `child-${Date.now()}`,
-        ...newChild,
-      };
-      setChildren((prev) => [...prev, child]);
-      setSelectedChild(child.id);
+  const fetchUserData = async () => {
+    try {
+      // Fetch parent profile
+      const parentRes = await API.get("/parent/profile");
+      if (parentRes.data.data) {
+        setParentInfo((prev) => ({
+          ...prev,
+          ...parentRes.data.data,
+          name: parentRes.data.data.full_name || "", // Map full_name to name
+          emergencyContact: parentRes.data.data.emergencyContact || "",
+          full_name: parentRes.data.data.full_name || "", // Keep full_name as well
+        }));
+      }
+
+      // Fetch children
+      const childrenRes = await API.get("/parent/children");
+      if (childrenRes.data.data && childrenRes.data.data.length > 0) {
+        setChildren(childrenRes.data.data);
+        // Auto-select first child
+        setSelectedChild(childrenRes.data.data[0].id);
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      // Continue with empty form if API fails
+    }
+  };
+
+  // Fetch parent profile and children
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  function getAge(dob) {
+    if (!dob) return 0;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  // Child management functions
+  const handleAddChild = async () => {
+    if (!newChild.name.trim()) return;
+
+    try {
+      // If you have an API endpoint to add children
+      const res = await API.post("/children", newChild);
+      const addedChild = res.data.data;
+
+      setChildren((prev) => [...prev, addedChild]);
+      setSelectedChild(addedChild.id);
       setNewChild({
         name: "",
-        age: 2,
+        age: 1,
+        gender: "male",
+        allergies: "",
+        specialNeeds: "",
+      });
+      setShowAddChild(false);
+    } catch (err) {
+      console.error("Error adding child:", err);
+      // Fallback: add locally if API fails
+      const localChild = {
+        id: Date.now(),
+        ...newChild,
+      };
+      setChildren((prev) => [...prev, localChild]);
+      setSelectedChild(localChild.id);
+      setNewChild({
+        name: "",
+        age: 1,
         gender: "male",
         allergies: "",
         specialNeeds: "",
@@ -188,43 +230,133 @@ export default function BookingPage({ params }) {
     }
   };
 
-  const handleRemoveChild = (childId) => {
-    setChildren((prev) => prev.filter((child) => child.id !== childId));
-    if (selectedChild === childId) {
-      setSelectedChild(children.length > 1 ? children[0].id : null);
-    }
-  };
-
+  // Booking flow functions
   const handleProceedToPayment = () => {
-    if (
-      !selectedChild ||
-      !bookingDate ||
-      !parentInfo.name ||
-      !parentInfo.phone
-    ) {
-      alert("Please fill in all required fields");
+    if (!selectedChild || !selectedDate || !selectedPackage) {
+      alert("Please fill in all required fields: child, date, and package.");
       return;
     }
     setShowConfirmation(true);
   };
 
-  const handleConfirmBooking = () => {
-    setShowConfirmation(false);
-    setShowPayment(true);
+  const handleConfirmBooking = async () => {
+    try {
+      const summaryPayload = {
+        child_id: selectedChild,
+        daycare_id: daycare.id,
+        package_id: selectedPackage.id,
+        date: selectedDate,
+        start_time: selectedTime,
+        end_time: calculateEndTime(selectedTime, selectedPackage),
+        total_amount: totalAmount,
+      };
+
+      const BookingPayload = {
+        child_id: selectedChild,
+        daycare_id: daycare.id,
+        package_id: selectedPackage.id,
+        start_date: selectedDate, // corrected
+        end_date: selectedDate, // corrected
+        pickup_time: selectedTime,
+        dropoff_time: calculateEndTime(selectedTime, selectedPackage),
+        days: ["0"], // example
+        special_requirements: "",
+        notes: "",
+      };
+
+      // First call: booking summary
+      const summaryResponse = await API.post(
+        "parent/booking/summary",
+        summaryPayload
+      );
+
+      // Second call: actual booking
+      const bookingResponse = await API.post("parent/bookings", BookingPayload);
+
+      // ✅ Both must succeed
+      if (
+        (summaryResponse.data.message || summaryResponse.data.success) &&
+        bookingResponse.data.message
+      ) {
+        toast.success("Booking confirmed successfully!");
+        console.log("Summary:", summaryResponse.data);
+        console.log("Booking:", bookingResponse.data);
+
+        // Payment details from summary
+        if (summaryResponse.data.payment) {
+          setUpiID(summaryResponse.data.payment.upi_id);
+          setUpiUrl(summaryResponse.data.payment.upi_qr);
+        } else {
+          setUpiID(null);
+          setUpiUrl(null);
+        }
+        setBookingCode(bookingResponse.data.booking.booking_code);
+        setBookingId(bookingResponse.data.booking.id);
+        setShowConfirmation(false);
+        setShowPayment(true);
+      } else {
+        toast.warning("Booking processed, but something unexpected happened.");
+      }
+    } catch (err) {
+      console.error("Error creating booking:", err);
+      toast.error("Failed to create booking. Please try again.");
+    }
   };
 
+  // Helper function to calculate end time based on package duration
   const handlePayment = async (method) => {
     setIsSubmitting(true);
-    // Simulate payment processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    setIsSubmitting(false);
-    setShowPayment(false);
-    alert("Payment successful! Booking confirmed.");
-    // Redirect to success page
+    try {
+      // Prepare payload according to backend validation
+      const paymentPayload = {
+        booking_id: bookingId,
+        method: method,
+        transaction_id: bookingCode,
+        amount: selectedPackage.price,
+        status: "pending",
+      };
+
+      console.log("Payment payload:", paymentPayload);
+
+      // Call backend API
+      const response = await API.post("parent/payment", paymentPayload);
+
+      if (response.data.success) {
+        toast.success("Payment recorded successfully!");
+        setShowPayment(false);
+        setIsDialogOpen(true); // Show booking/payment success dialog
+      } else {
+        toast.error(response.data.message || "Payment failed.");
+      }
+
+      setIsSubmitting(false);
+    } catch (err) {
+      console.error("Payment error:", err);
+      toast.error(
+        err.response?.data?.message || "Payment failed. Please try again."
+      );
+      setIsSubmitting(false);
+    }
   };
 
-  if (!daycare || !selectedPackage) {
+  const calculateEndTime = (startTime, pkg) => {
+    if (!startTime || !pkg) return "";
+    const start = new Date(`2000-01-01T${startTime}`);
+    const durationHours = parseInt(pkg.duration) || 2; // Default to 2 hours if not specified
+    const end = new Date(start.getTime() + durationHours * 60 * 60 * 1000);
+    return format(end, "HH:mm");
+  };
+
+  // Calculate total amount
+  const totalAmount = selectedPackage ? selectedPackage.price : 0;
+
+  // Get selected child data
+  const selectedChildData = children.find(
+    (child) => child.id === selectedChild
+  );
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -235,8 +367,31 @@ export default function BookingPage({ params }) {
     );
   }
 
-  const selectedChildData = children.find((c) => c.id === selectedChild);
-  const totalAmount = selectedPackage.price;
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="text-red-500 text-lg mb-4">{error}</div>
+          <Button asChild>
+            <Link href="/daycares">Browse Daycares</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!daycare) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="text-gray-500 text-lg mb-4">Daycare not found</div>
+          <Button asChild>
+            <Link href="/daycares">Browse Daycares</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -285,15 +440,15 @@ export default function BookingPage({ params }) {
                       <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full">
                         <Star className="h-3 w-3 text-amber-400" />
                         <span className="text-xs font-semibold">
-                          {daycare.rating}
+                          {daycare.rating || "4.5"}
                         </span>
                         <span className="text-xs text-gray-600">
-                          ({daycare.reviewCount} reviews)
+                          ({daycare.reviewCount || "50"} reviews)
                         </span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-gray-600">
                         <MapPin className="h-3 w-3" />
-                        {daycare.location}
+                        {daycare.location || daycare.address}
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mt-2">
@@ -321,13 +476,14 @@ export default function BookingPage({ params }) {
                     <Label htmlFor="parent-name">Full Name *</Label>
                     <Input
                       id="parent-name"
-                      value={parentInfo.name}
+                      value={parentInfo.name || ""} // Ensure value is never undefined
                       onChange={(e) =>
                         setParentInfo((prev) => ({
                           ...prev,
                           name: e.target.value,
                         }))
                       }
+                      disabled
                       placeholder="Enter your full name"
                     />
                   </div>
@@ -336,7 +492,8 @@ export default function BookingPage({ params }) {
                     <Input
                       id="parent-email"
                       type="email"
-                      value={parentInfo.email}
+                      disabled
+                      value={parentInfo.email || ""} // Ensure value is never undefined
                       onChange={(e) =>
                         setParentInfo((prev) => ({
                           ...prev,
@@ -351,7 +508,8 @@ export default function BookingPage({ params }) {
                     <Input
                       id="parent-phone"
                       type="tel"
-                      value={parentInfo.phone}
+                      disabled
+                      value={parentInfo.phone || ""} // Ensure value is never undefined
                       onChange={(e) =>
                         setParentInfo((prev) => ({
                           ...prev,
@@ -368,7 +526,7 @@ export default function BookingPage({ params }) {
                     <Input
                       id="emergency-contact"
                       type="tel"
-                      value={parentInfo.emergencyContact}
+                      value={parentInfo.emergencyContact || ""} // Ensure value is never undefined
                       onChange={(e) =>
                         setParentInfo((prev) => ({
                           ...prev,
@@ -382,7 +540,7 @@ export default function BookingPage({ params }) {
                 <div className="space-y-2">
                   <Label htmlFor="relationship">Relationship to Child *</Label>
                   <Select
-                    value={parentInfo.relationship}
+                    value={parentInfo.relationship || "Parent"} // Ensure value is never undefined
                     onValueChange={(value) =>
                       setParentInfo((prev) => ({
                         ...prev,
@@ -411,32 +569,21 @@ export default function BookingPage({ params }) {
                   <Baby className="h-5 w-5 text-pink-600" />
                   Child Information
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAddChild(true)}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Child
-                </Button>
+
+                <AddChildPopover onChildAdded={() => fetchUserData()} />
               </CardHeader>
               <CardContent>
                 {children.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <Baby className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                     <p>No children added yet</p>
-                    <Button
-                      variant="outline"
-                      className="mt-4"
-                      onClick={() => setShowAddChild(true)}
-                    >
-                      Add Your First Child
-                    </Button>
+
+                    <AddChildPopover onChildAdded={() => fetchUserData()} />
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <RadioGroup
-                      value={selectedChild}
+                      value={selectedChild || ""} // Ensure value is never undefined
                       onValueChange={setSelectedChild}
                     >
                       {children.map((child) => (
@@ -453,9 +600,11 @@ export default function BookingPage({ params }) {
                               htmlFor={`child-${child.id}`}
                               className="cursor-pointer"
                             >
-                              <div className="font-medium">{child.name}</div>
+                              <div className="font-medium">
+                                {child.full_name}
+                              </div>
                               <div className="text-sm text-gray-600">
-                                {child.age} years •{" "}
+                                {getAge(child.dob)} years •{" "}
                                 {child.gender === "male" ? "Boy" : "Girl"}
                                 {child.allergies &&
                                   child.allergies !== "None" &&
@@ -463,14 +612,6 @@ export default function BookingPage({ params }) {
                               </div>
                             </Label>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveChild(child.id)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       ))}
                     </RadioGroup>
@@ -489,38 +630,41 @@ export default function BookingPage({ params }) {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {daycare.packages.map((pkg) => (
-                    <div
-                      key={pkg.id}
-                      className={cn(
-                        "border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md",
-                        selectedPackage.id === pkg.id
-                          ? "border-primary bg-blue-50"
-                          : "border-gray-200 bg-white"
-                      )}
-                      onClick={() => setSelectedPackage(pkg)}
-                    >
-                      {pkg.popular && (
-                        <Badge className="mb-2 bg-primary">Most Popular</Badge>
-                      )}
-                      <div className="font-semibold text-gray-900">
-                        {pkg.title}
-                      </div>
-                      <div className="text-2xl font-bold text-primary my-2">
-                        {currency(pkg.price)}
-                      </div>
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {pkg.hours}
+                  {daycare.packages &&
+                    daycare.packages.map((pkg) => (
+                      <div
+                        key={pkg.id}
+                        className={cn(
+                          "border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md",
+                          selectedPackage?.id === pkg.id
+                            ? "border-primary bg-blue-50"
+                            : "border-gray-200 bg-white"
+                        )}
+                        onClick={() => setSelectedPackage(pkg)}
+                      >
+                        {pkg.popular && (
+                          <Badge className="mb-2 bg-primary">
+                            Most Popular
+                          </Badge>
+                        )}
+                        <div className="font-semibold text-gray-900">
+                          {pkg.title}
                         </div>
-                        <div>{pkg.description}</div>
-                        <div className="text-xs text-gray-500">
-                          {pkg.duration}
+                        <div className="text-2xl font-bold text-primary my-2">
+                          {currency(pkg.price)}
+                        </div>
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {pkg.hours}
+                          </div>
+                          <div>{pkg.description}</div>
+                          <div className="text-xs text-gray-500">
+                            {pkg.duration}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </CardContent>
             </Card>
@@ -540,19 +684,31 @@ export default function BookingPage({ params }) {
                     <Input
                       id="booking-date"
                       type="date"
-                      value={bookingDate}
-                      onChange={(e) => setBookingDate(e.target.value)}
+                      value={selectedDate || ""} // Ensure value is never undefined
+                      onChange={(e) => setSelectedDate(e.target.value)}
                       min={format(new Date(), "yyyy-MM-dd")}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="booking-duration">Duration</Label>
-                    <Input
-                      id="booking-duration"
-                      value={selectedPackage.duration}
-                      disabled
-                      className="bg-gray-50"
-                    />
+                    <Label htmlFor="booking-time">Preferred Time *</Label>
+                    <Select
+                      value={selectedTime || ""} // Ensure value is never undefined
+                      onValueChange={setSelectedTime}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="09:00">9:00 AM</SelectItem>
+                        <SelectItem value="10:00">10:00 AM</SelectItem>
+                        <SelectItem value="11:00">11:00 AM</SelectItem>
+                        <SelectItem value="12:00">12:00 PM</SelectItem>
+                        <SelectItem value="13:00">1:00 PM</SelectItem>
+                        <SelectItem value="14:00">2:00 PM</SelectItem>
+                        <SelectItem value="15:00">3:00 PM</SelectItem>
+                        <SelectItem value="16:00">4:00 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -560,7 +716,7 @@ export default function BookingPage({ params }) {
                   <Textarea
                     id="special-requests"
                     placeholder="Any special requirements, allergies, or notes for the daycare staff..."
-                    value={specialReq}
+                    value={specialReq || ""} // Ensure value is never undefined
                     onChange={(e) => setSpecialReq(e.target.value)}
                     rows={3}
                   />
@@ -578,7 +734,7 @@ export default function BookingPage({ params }) {
               </CardHeader>
               <CardContent>
                 <RadioGroup
-                  value={paymentMethod}
+                  value={paymentMethod || "upi"} // Ensure value is never undefined
                   onValueChange={setPaymentMethod}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -608,32 +764,6 @@ export default function BookingPage({ params }) {
                         </div>
                       </Label>
                     </div>
-                    <div
-                      className={cn(
-                        "border-2 rounded-lg p-4 cursor-pointer",
-                        paymentMethod === "card"
-                          ? "border-primary bg-blue-50"
-                          : "border-gray-200"
-                      )}
-                    >
-                      <RadioGroupItem
-                        value="card"
-                        id="card"
-                        className="sr-only"
-                      />
-                      <Label
-                        htmlFor="card"
-                        className="cursor-pointer flex items-center gap-3"
-                      >
-                        <CreditCard className="h-6 w-6 text-blue-600" />
-                        <div>
-                          <div className="font-medium">Credit/Debit Card</div>
-                          <div className="text-sm text-gray-600">
-                            Pay with card
-                          </div>
-                        </div>
-                      </Label>
-                    </div>
                   </div>
                 </RadioGroup>
               </CardContent>
@@ -654,12 +784,12 @@ export default function BookingPage({ params }) {
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Child:</span>
                         <span className="font-medium">
-                          {selectedChildData.name}
+                          {selectedChildData.full_name}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Age:</span>
-                        <span>{selectedChildData.age} years</span>
+                        <span>{getAge(selectedChildData.dob)} years</span>
                       </div>
                     </div>
                   )}
@@ -668,20 +798,24 @@ export default function BookingPage({ params }) {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Package:</span>
                       <span className="font-medium">
-                        {selectedPackage.title}
+                        {selectedPackage?.title || "Not selected"}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Duration:</span>
-                      <span>{selectedPackage.duration}</span>
+                      <span>{selectedPackage?.duration || "-"}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Start Date:</span>
                       <span>
-                        {bookingDate
-                          ? format(new Date(bookingDate), "MMM d, yyyy")
+                        {selectedDate
+                          ? format(new Date(selectedDate), "MMM d, yyyy")
                           : "-"}
                       </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Time:</span>
+                      <span>{selectedTime || "-"}</span>
                     </div>
                   </div>
 
@@ -698,7 +832,9 @@ export default function BookingPage({ params }) {
                     className="w-full"
                     size="lg"
                     onClick={handleProceedToPayment}
-                    disabled={!selectedChild || !bookingDate}
+                    disabled={
+                      !selectedChild || !selectedDate || !selectedPackage
+                    }
                   >
                     <CreditCard className="h-4 w-4 mr-2" />
                     Proceed to Payment
@@ -741,7 +877,7 @@ export default function BookingPage({ params }) {
               <Label htmlFor="child-name">Child's Name *</Label>
               <Input
                 id="child-name"
-                value={newChild.name}
+                value={newChild.name || ""} // Ensure value is never undefined
                 onChange={(e) =>
                   setNewChild((prev) => ({ ...prev, name: e.target.value }))
                 }
@@ -752,7 +888,7 @@ export default function BookingPage({ params }) {
               <div className="space-y-2">
                 <Label htmlFor="child-age">Age *</Label>
                 <Select
-                  value={newChild.age.toString()}
+                  value={newChild.age?.toString() || "1"} // Ensure value is never undefined
                   onValueChange={(value) =>
                     setNewChild((prev) => ({ ...prev, age: parseInt(value) }))
                   }
@@ -772,7 +908,7 @@ export default function BookingPage({ params }) {
               <div className="space-y-2">
                 <Label htmlFor="child-gender">Gender *</Label>
                 <Select
-                  value={newChild.gender}
+                  value={newChild.gender || "male"} // Ensure value is never undefined
                   onValueChange={(value) =>
                     setNewChild((prev) => ({ ...prev, gender: value }))
                   }
@@ -791,7 +927,7 @@ export default function BookingPage({ params }) {
               <Label htmlFor="child-allergies">Allergies</Label>
               <Input
                 id="child-allergies"
-                value={newChild.allergies}
+                value={newChild.allergies || ""} // Ensure value is never undefined
                 onChange={(e) =>
                   setNewChild((prev) => ({
                     ...prev,
@@ -805,7 +941,7 @@ export default function BookingPage({ params }) {
               <Label htmlFor="child-special-needs">Special Needs</Label>
               <Textarea
                 id="child-special-needs"
-                value={newChild.specialNeeds}
+                value={newChild.specialNeeds || ""} // Ensure value is never undefined
                 onChange={(e) =>
                   setNewChild((prev) => ({
                     ...prev,
@@ -845,17 +981,26 @@ export default function BookingPage({ params }) {
                 </div>
                 <div className="flex justify-between">
                   <span>Child:</span>
-                  <span>{selectedChildData?.name}</span>
+                  <span>{selectedChildData?.full_name}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Package:</span>
                   <span>
-                    {selectedPackage.title} - {currency(selectedPackage.price)}
+                    {selectedPackage?.title} -{" "}
+                    {currency(selectedPackage?.price || 0)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Start Date:</span>
-                  <span>{format(new Date(bookingDate), "MMMM d, yyyy")}</span>
+                  <span>
+                    {selectedDate
+                      ? format(new Date(selectedDate), "MMMM d, yyyy")
+                      : "-"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Time:</span>
+                  <span>{selectedTime || "-"}</span>
                 </div>
                 <div className="flex justify-between font-semibold border-t pt-2 mt-2">
                   <span>Total Amount:</span>
@@ -880,7 +1025,7 @@ export default function BookingPage({ params }) {
             </Button>
             <Button onClick={handleConfirmBooking}>
               <CreditCard className="h-4 w-4 mr-2" />
-              Confirm & Pay
+              Confirm & Pay {currency(totalAmount)}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -893,7 +1038,7 @@ export default function BookingPage({ params }) {
             <DialogTitle>Complete Payment</DialogTitle>
           </DialogHeader>
           <div className="space-y-6">
-            {paymentMethod === "upi" ? (
+            {paymentMethod === "upi" && (
               <div className="text-center space-y-4">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="font-semibold text-lg text-primary mb-2">
@@ -907,7 +1052,17 @@ export default function BookingPage({ params }) {
                 {/* QR Code Placeholder */}
                 <div className="bg-white p-6 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                   <div className="text-center">
-                    <QrCode className="h-24 w-24 mx-auto text-gray-400 mb-2" />
+                    {upiUrl ? (
+                      // Show actual QR code image from URL
+                      <img
+                        src={upiUrl}
+                        alt="UPI QR Code"
+                        className="h-24 w-24 mx-auto mb-2"
+                      />
+                    ) : (
+                      // Show placeholder/loading QR icon
+                      <QrCode className="h-24 w-24 mx-auto text-gray-400 mb-2 animate-pulse" />
+                    )}
                     <div className="text-xs text-gray-500">
                       QR Code for UPI Payment
                     </div>
@@ -925,50 +1080,20 @@ export default function BookingPage({ params }) {
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block"></div>
                         Processing...
                       </>
                     ) : (
                       <>
-                        <Smartphone className="h-4 w-4 mr-2" />
+                        <Smartphone className="h-4 w-4 mr-2 inline-block" />
                         I've Paid via UPI
                       </>
                     )}
                   </Button>
                   <div className="text-xs text-gray-500">
-                    Or use UPI ID: sunshine-daycare@oksbi
+                    Or use UPI ID: {upiID}
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="card-number">Card Number</Label>
-                  <Input id="card-number" placeholder="1234 5678 9012 3456" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="expiry">Expiry Date</Label>
-                    <Input id="expiry" placeholder="MM/YY" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cvv">CVV</Label>
-                    <Input id="cvv" placeholder="123" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="card-name">Name on Card</Label>
-                  <Input id="card-name" placeholder="John Doe" />
-                </div>
-                <Button
-                  className="w-full"
-                  onClick={() => handlePayment("card")}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting
-                    ? "Processing..."
-                    : `Pay ${currency(totalAmount)}`}
-                </Button>
               </div>
             )}
 
@@ -977,6 +1102,39 @@ export default function BookingPage({ params }) {
               Your payment is secure and encrypted
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">
+              Booking Confirmed! 🎉
+            </DialogTitle>
+          </DialogHeader>
+          <div className="text-center space-y-4">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
+            <div>
+              <p className="font-semibold">Your booking has been confirmed!</p>
+              <p className="text-sm text-gray-600 mt-2">
+                A confirmation email has been sent to {parentInfo.email}
+              </p>
+            </div>
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <p className="text-xs text-gray-600">
+                Booking Code: <strong>{bookingCode}</strong>
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              className="w-full"
+              onClick={() => router.push("/parents/bookings")}
+            >
+              View My Bookings
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

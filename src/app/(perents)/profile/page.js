@@ -270,7 +270,7 @@ export default function ParentProfilePage() {
                     <h3 className="text-lg font-semibold text-gray-900">
                       My Children
                     </h3>
-                
+
                     <AddChildPopover
                       onChildAdded={(child) =>
                         setChildren([...children, child])

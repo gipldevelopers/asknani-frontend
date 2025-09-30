@@ -164,44 +164,7 @@ export default function BookingsManagement() {
         </Link>
       </div>
 
-      {/* Filters */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search by parent name, child name, or booking code..."
-                className="pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                Filter
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex gap-2 mt-4 overflow-x-auto">
-            {["all", "confirmed", "pending", "cancelled", "completed"].map(
-              (status) => (
-                <Button
-                  key={status}
-                  variant={statusFilter === status ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStatusFilter(status)}
-                >
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </Button>
-              )
-            )}
-          </div>
-        </CardContent>
-      </Card>
+ 
 
       {/* Bookings List */}
       <div className="space-y-4">

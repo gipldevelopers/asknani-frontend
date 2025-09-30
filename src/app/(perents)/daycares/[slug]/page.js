@@ -39,6 +39,10 @@ import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import API from "@/lib/api";
+import toast from "react-hot-toast";
+import useAuthStore from "@/stores/AuthStore";
+import { useRouter } from "next/navigation";
+import AddChildPopover from "@/components/Bookings/AddChild";
 
 // --------------------------- Dummy Data ---------------------------
 
@@ -71,9 +75,12 @@ export default function DaycareDetailPage({ params }) {
   const [packages, setPackages] = useState(false);
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { user } = useAuthStore();
+  const router = useRouter();
   const images = daycare?.images || [];
 
   useEffect(() => {
+    setLoading(true);
     const loadData = async () => {
       try {
         setLoading(true);
@@ -127,21 +134,50 @@ export default function DaycareDetailPage({ params }) {
   }, [showReviewModal, showTourModal]);
 
   // Handlers
-  const submitReview = (reviewData) => {
-    const newReview = {
-      id: `r${Date.now()}`,
-      ...reviewData,
-      date: format(new Date(), "yyyy-MM-dd"),
-    };
+  const submitReview = async (reviewData, daycareId) => {
+    if (!user) {
+      // Not logged in → redirect to login with current page as origin
+      const origin = encodeURIComponent(window.location.pathname);
+      router.push(`/login?origin=${origin}`);
+      return;
+    }
 
-    setDaycare((prev) => ({
-      ...prev,
-      reviews: [newReview, ...prev.reviews],
-      reviewCount: prev.reviewCount + 1,
-    }));
+    if (!daycareId) {
+      toast.error("Daycare not loaded yet. Please try again.");
+      return;
+    }
 
-    setShowReviewModal(false);
-    alert("Review submitted successfully!");
+    try {
+      const payload = {
+        daycare_id: daycareId,
+        rating: reviewData.rating,
+        text: reviewData.text || "",
+      };
+
+      const res = await API.post("/parent/reviews", payload);
+
+      if (res.data.review) {
+        const newReview = {
+          id: `r${res.data.review.id}`,
+          name: res.data.review.parent.name,
+          rating: res.data.review.rating,
+          text: res.data.review.text,
+          date: res.data.review.date,
+        };
+
+        setDaycare((prev) => ({
+          ...prev,
+          reviews: [newReview, ...prev.reviews],
+          reviewCount: prev.reviewCount + 1,
+        }));
+
+        toast.success("Review submitted successfully!");
+        setShowReviewModal(false);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to submit review. Please try again.");
+    }
   };
 
   const scheduleTour = (tourData) => {
@@ -152,7 +188,7 @@ export default function DaycareDetailPage({ params }) {
   };
 
   // Render Logic
-  if (loading) {
+  if (loading || !daycare) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -490,38 +526,56 @@ export default function DaycareDetailPage({ params }) {
                 Write a Review
               </Button>
             </CardHeader>
+
             <CardContent>
-              <div className="space-y-6">
-                {d.reviews.map((review) => (
-                  <div
-                    key={review.id}
-                    className="border-b pb-6 last:border-0 last:pb-0"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center font-semibold text-blue-600">
-                          {review.name[0]}
+              {d.reviews.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">
+                  No reviews yet. Be the first to write a review!
+                </p>
+              ) : (
+                <div className="space-y-6">
+                  {d.reviews.map((review) => (
+                    <div
+                      key={review.id}
+                      className="border-b pb-6 last:border-0 last:pb-0"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-green-100 flex items-center justify-center font-semibold text-blue-600">
+                            {review.name?.[0] ?? "?"}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900">
+                              {review.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {format(new Date(review.date), "MMMM d, yyyy")}
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {review.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {format(new Date(review.date), "MMMM d, yyyy")}
-                          </div>
+                        <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i <= review.rating
+                                  ? "text-amber-400 fill-amber-400"
+                                  : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                          <span className="font-semibold ml-1">
+                            {review.rating}
+                          </span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full">
-                        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                        <span className="font-semibold">{review.rating}</span>
-                      </div>
+                      <p className="text-gray-700 leading-relaxed">
+                        {review.text}
+                      </p>
                     </div>
-                    <p className="text-gray-700 leading-relaxed">
-                      {review.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </section>
@@ -565,39 +619,11 @@ export default function DaycareDetailPage({ params }) {
                       Message Daycare
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href={`tel:${d.phone}`}>
-                      <Phone className="w-4 h-4 mr-2" />
-                      Call Now
-                    </a>
-                  </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Operating Hours */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Operating Hours
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between items-center py-2 border-b">
-                  <span className="text-gray-600">Weekdays</span>
-                  <span className="font-semibold">
-                    {d.operatingHours.weekdays}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">Weekends</span>
-                  <span className="font-semibold">
-                    {d.operatingHours.weekends}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+    
 
             {/* Safety Card */}
             <Card>
@@ -666,6 +692,7 @@ export default function DaycareDetailPage({ params }) {
         open={showReviewModal}
         onOpenChange={setShowReviewModal}
         onSubmit={submitReview}
+        daycare={daycare} // ✅ important
       />
     </div>
   );
@@ -673,48 +700,156 @@ export default function DaycareDetailPage({ params }) {
 
 // --------------------------- Tour Modal Component ---------------------------
 function TourModal({ open, onOpenChange, daycare, onSchedule }) {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [selectedChild, setSelectedChild] = useState(null);
+  const [children, setChildren] = useState([]);
   const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [childrenLoading, setChildrenLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const availableTimes = ["9:00 AM", "11:00 AM", "2:00 PM", "4:00 PM"];
+  const generateTimeSlots = (start = 9, end = 18, interval = 2) => {
+    const slots = [];
+    for (let hour = start; hour < end; hour += interval) {
+      const startHour = hour;
+      const endHour = hour + interval;
 
-  const handleSubmit = () => {
-    if (!date || !time || !name || !phone) {
-      alert("Please fill in all required fields");
+      // Convert to 12-hour format
+      const formatTime = (h) => {
+        const period = h >= 12 ? "PM" : "AM";
+        const hour12 = h % 12 === 0 ? 12 : h % 12;
+        return `${hour12}:00 ${period}`;
+      };
+
+      slots.push(`${formatTime(startHour)} - ${formatTime(endHour)}`);
+    }
+    return slots;
+  };
+
+  // Usage
+  const availableTimes = generateTimeSlots();
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user && open) {
+      toast("Please login to schedule a tour", { icon: "⚠️" });
+      onOpenChange(false);
+      router.push("/login");
+    }
+  }, [user, open, router, onOpenChange]);
+  const fetchChildren = async () => {
+    setChildrenLoading(true);
+    try {
+      const res = await API.get("/parent/children");
+      // res.data is { success: true, data: [...] }
+      setChildren(res.data.data || []); // <- use .data here
+    } catch (err) {
+      console.error("Failed to fetch children", err);
+      toast.error("Failed to load children list");
+    } finally {
+      setChildrenLoading(false);
+    }
+  };
+  // Fetch children if logged in
+  useEffect(() => {
+    if (user) {
+      fetchChildren();
+    }
+  }, [user]);
+
+  function getAge(dob) {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+  const handleSubmit = async () => {
+    if (!date || !time || !selectedChild) {
+      setErrorMessage("Please fill in all required fields");
       return;
     }
-    onSchedule({ date, time, name, phone, notes });
+
+    setLoading(true);
+    setErrorMessage(""); // clear previous errors
+    try {
+      const [startTime] = time.split(" - "); // use first time of 2h slot
+      const dateTime = new Date(`${date} ${startTime}`);
+
+      const payload = {
+        daycare_id: daycare?.id,
+        date_time: dateTime.toISOString(), // send in ISO format
+        notes,
+        child_id: selectedChild?.id,
+      };
+
+      const res = await API.post("/parent/tours", payload);
+
+      toast.success("Tour scheduled successfully!");
+      if (onSchedule) onSchedule(res.data.data);
+
+      // Reset
+      setDate("");
+      setTime("");
+      setSelectedChild(null);
+      setNotes("");
+      setErrorMessage("");
+      onOpenChange(false);
+    } catch (err) {
+      console.error(err);
+      const backendError =
+        err.response?.data?.errors?.date_time?.[0] ||
+        err.response?.data?.message ||
+        "Failed to schedule tour";
+      setErrorMessage(backendError);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Schedule a Tour at {daycare?.name}</DialogTitle>
+      <DialogContent className="sm:max-w-md p-6 bg-white rounded-2xl shadow-lg">
+        <DialogHeader className="text-center">
+          <DialogTitle className="text-2xl font-semibold text-gray-800">
+            Schedule a Tour at{" "}
+            <span className="text-indigo-600">{daycare?.name}</span>
+          </DialogTitle>
+          <p className="text-gray-500 mt-1">
+            Pick a date, time, and child to proceed
+          </p>
         </DialogHeader>
-
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+        {errorMessage && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg my-4">
+            {errorMessage}
+          </div>
+        )}
+        <div className="mt-6 space-y-5">
+          {/* Date & Time */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col space-y-1">
               <Label htmlFor="tour-date">Date *</Label>
               <input
                 type="date"
                 id="tour-date"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 min={new Date().toISOString().split("T")[0]}
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col space-y-1">
               <Label htmlFor="tour-time">Time *</Label>
               <select
                 id="tour-time"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
               >
@@ -728,35 +863,55 @@ function TourModal({ open, onOpenChange, daycare, onSchedule }) {
             </div>
           </div>
 
+          {/* Children selection */}
           <div className="space-y-2">
-            <Label htmlFor="tour-name">Your Name *</Label>
-            <input
-              id="tour-name"
-              type="text"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <Label>Select Child *</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button className="w-full text-left border p-3 rounded-lg justify-between">
+                  {selectedChild ? selectedChild.full_name : "Select a child"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-3 space-y-2">
+                {childrenLoading ? (
+                  <span>Loading children...</span>
+                ) : children.length === 0 ? (
+                  <span>No children found</span>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {children.map((child) => (
+                      <Button
+                        key={child.id}
+                        variant="ghost"
+                        size="sm"
+                        className="justify-between w-full"
+                        onClick={() => setSelectedChild(child)}
+                      >
+                        <span>
+                          {child.full_name} ({getAge(child.dob)} yrs)
+                        </span>
+                        {selectedChild?.id === child.id && (
+                          <span className="text-indigo-500 font-medium">
+                            Selected
+                          </span>
+                        )}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+                <div className="mt-2">
+                  <AddChildPopover onChildAdded={() => fetchChildren()} />
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="tour-phone">Phone Number *</Label>
-            <input
-              id="tour-phone"
-              type="tel"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-
+          {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="tour-notes">Additional Notes</Label>
             <textarea
               id="tour-notes"
-              className="w-full p-2 border rounded-md"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
               placeholder="Any specific questions or requirements..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -765,16 +920,17 @@ function TourModal({ open, onOpenChange, daycare, onSchedule }) {
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="mt-6 flex justify-end gap-3">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
             Cancel
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!date || !time || !name || !phone}
-          >
-            <CalendarCheck className="w-4 h-4 mr-2" />
-            Schedule Tour
+          <Button onClick={handleSubmit} disabled={loading}>
+            <CalendarCheck className="w-5 h-5 mr-2" />
+            {loading ? "Scheduling..." : "Schedule Tour"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -783,21 +939,23 @@ function TourModal({ open, onOpenChange, daycare, onSchedule }) {
 }
 
 // --------------------------- Review Modal Component ---------------------------
-function ReviewModal({ open, onOpenChange, onSubmit }) {
+function ReviewModal({ open, onOpenChange, onSubmit, daycare }) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const [name, setName] = useState("");
 
   const handleSubmit = () => {
-    if (!name.trim() || !comment.trim()) {
-      alert("Please fill in all fields");
+    if (!comment.trim()) {
+      toast.error("Please fill in all fields");
       return;
     }
-    onSubmit({
-      name: name.trim(),
-      rating,
-      text: comment.trim(),
-    });
+
+    if (!daycare || !daycare.id) {
+      toast.error("Daycare not loaded yet. Please try again.");
+      return;
+    }
+
+    // ✅ Pass daycare.id as second argument
+    onSubmit({ rating, text: comment.trim() }, daycare.id);
   };
 
   return (
@@ -808,18 +966,6 @@ function ReviewModal({ open, onOpenChange, onSubmit }) {
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="review-name">Your Name *</Label>
-            <input
-              id="review-name"
-              type="text"
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
           <div className="space-y-2">
             <Label>Rating *</Label>
             <div className="flex gap-1">
@@ -860,10 +1006,7 @@ function ReviewModal({ open, onOpenChange, onSubmit }) {
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!name.trim() || !comment.trim()}
-          >
+          <Button onClick={handleSubmit} disabled={!comment.trim()}>
             Submit Review
           </Button>
         </DialogFooter>

@@ -68,8 +68,6 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [closeCityDropdown, closeProfile]);
 
-
-
   // Filtered cities for dropdown
   const filteredCities = cities.filter((city) =>
     city.name.toLowerCase().includes(citySearchQuery.toLowerCase())
@@ -177,11 +175,6 @@ export default function Navbar() {
                   className="p-2 text-gray-500 hover:text-indigo-600 relative"
                 >
                   <MessageCircle size={24} />
-                  {unreadCount > 0 && (
-                    <span className="absolute mt-7 -top-1 -right-1 bg-red-500 text-white text-xs font-medium px-1.5 py-0.5 rounded-full shadow">
-                      {unreadCount}
-                    </span>
-                  )}
                 </Link>
               </div>
             )}

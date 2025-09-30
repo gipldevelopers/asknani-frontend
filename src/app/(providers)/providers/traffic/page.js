@@ -175,15 +175,7 @@ const TrafficPage = ({ daycareId = 1 }) => { // Use a default ID or prop
                             ))}
                         </div>
                         
-                        <button className="flex items-center text-sm text-gray-600 hover:text-gray-900 bg-white border border-gray-200 rounded-lg px-3 py-2">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            Select Date
-                        </button>
-                        
-                        <button className="flex items-center text-sm text-gray-600 hover:text-gray-900 bg-blue-600  rounded-lg px-3 py-2 transition-colors">
-                            <Download className="w-4 h-4 mr-1" />
-                            Export
-                        </button>
+                       
                     </div>
                 </div>
 
@@ -283,27 +275,12 @@ const TrafficPage = ({ daycareId = 1 }) => { // Use a default ID or prop
                     </div>
                 </div>
 
-                {/* Tabs (Content remains simple, showing data based on activeTab) */}
-                <div className="flex border-b border-gray-200 mb-6">
-                    {['overview', 'sources', 'locations', 'devices'].map((tab) => (
-                        <button
-                            key={tab}
-                            className={`px-4 py-2 font-medium text-sm capitalize transition-colors ${
-                                activeTab === tab
-                                    ? 'text-blue-600 border-b-2 border-blue-600'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                            onClick={() => setActiveTab(tab)}
-                        >
-                            {tab}
-                        </button>
-                    ))}
-                </div>
+               
 
                 {/* Main Content Area */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column - Traffic Chart (REAL Daily Trend) */}
-                    <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div className="lg:col-span-4 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-lg font-semibold text-gray-900">Unique Visitors Trend ({dateRange})</h2>
                             <button className="flex items-center text-sm text-gray-600 hover:text-gray-900">
@@ -333,86 +310,9 @@ const TrafficPage = ({ daycareId = 1 }) => { // Use a default ID or prop
                         </div>
                     </div>
 
-                    {/* Right Column - Traffic Sources & Devices (REAL Data) */}
-                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-6">Traffic Sources</h2>
-                        
-                        <div className="space-y-5">
-                            {calculateSourceData.map((source, index) => (
-                                <div key={index}>
-                                    <div className="flex justify-between mb-1">
-                                        <span className="text-sm font-medium text-gray-900">{source.name}</span>
-                                        <span className="text-sm font-medium text-gray-900">{source.value}%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div 
-                                            className={`${source.color} h-2 rounded-full`} 
-                                            style={{ width: `${source.value}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="mt-8">
-                            <h3 className="text-md font-medium text-gray-900 mb-4">Devices</h3>
-                            <div className="space-y-3">
-                                {calculateDeviceData.map((device, index) => (
-                                    <div key={index} className="flex items-center justify-between">
-                                        <div className="flex items-center">
-                                            <span className="text-gray-500 mr-2">{device.icon}</span>
-                                            <span className="text-sm text-gray-700">{device.type}</span>
-                                        </div>
-                                        <span className="text-sm font-medium text-gray-900">{device.value}%</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                {/* Visitor Locations (REAL/Mocked Data from Backend) */}
-                <div className="mt-6 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">Visitor Locations (Mocked by City)</h2>
-                    
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full">
-                            <thead>
-                                <tr className="text-left text-sm text-gray-500 border-b border-gray-200">
-                                    <th className="pb-3 px-2">City</th>
-                                    <th className="pb-3 px-2">Visitors</th>
-                                    <th className="pb-3 px-2">Percentage</th>
-                                    <th className="pb-3 px-2">Trend</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {trafficData.locations.map((location, index) => (
-                                    <tr key={index} className="hover:bg-gray-50">
-                                        <td className="py-3 px-2">
-                                            <div className="flex items-center">
-                                                <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                                                <span className="font-medium">{location.city}</span>
-                                            </div>
-                                        </td>
-                                        <td className="py-3 px-2">{location.visitors}</td>
-                                        <td className="py-3 px-2">
-                                            {/* Calculate percentage relative to the unique visitors in the selected range */}
-                                            {trafficData.uniqueVisitors > 0 ? 
-                                                `${Math.round((location.visitors / trafficData.uniqueVisitors) * 100)}%`
-                                                : '0%'}
-                                        </td>
-                                        <td className="py-3 px-2">
-                                            <div className="flex items-center">
-                                                <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-                                                <span className="text-green-500 text-sm">+{Math.floor(Math.random() * 10) + 5}%</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+           
             </div>
         </div>
     );

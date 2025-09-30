@@ -31,8 +31,6 @@ const ProviderDashboardLayout = ({ children }) => {
     loadToken(); // ✅ load token once on app mount
   }, [loadToken]);
 
-
-  
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigation = [
@@ -41,8 +39,6 @@ const ProviderDashboardLayout = ({ children }) => {
       name: "Bookings",
       href: "/providers/bookings",
       icon: Calendar,
-      count: 3,
-      hasUnread: true,
     },
     { name: "Children", href: "/providers/childrens", icon: Users },
     { name: "Payments", href: "/providers/payments", icon: IndianRupee },
@@ -58,12 +54,10 @@ const ProviderDashboardLayout = ({ children }) => {
       name: "Reviews",
       href: "/providers/reviews",
       icon: Star,
-      count: 2,
-      hasUnread: true,
     },
     { name: "Traffic", href: "/providers/traffic", icon: ChartNoAxesCombined },
-    { name: "Promotional ", href: "/providers/promotional", icon: Megaphone },
-    { name: "Settings", href: "#", icon: Settings },
+    // { name: "Promotional ", href: "/providers/promotional", icon: Megaphone },
+    { name: "Settings", href: "/providers/settings", icon: Settings },
   ];
   return (
     <>

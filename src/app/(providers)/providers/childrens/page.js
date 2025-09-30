@@ -205,8 +205,6 @@ export default function ChildrenManagementPage() {
   const stats = [
     { label: "Total Children", value: totalChildren, icon: User },
     { label: "Active Children", value: activeChildren, icon: CalendarIcon },
-    { label: "Medical Alerts", value: medicalAlerts, icon: AlertCircle },
-    { label: "Attendance Rate", value: "92%", icon: Heart },
   ];
 
   const getStatusVariant = (status) => {
@@ -351,7 +349,7 @@ export default function ChildrenManagementPage() {
         </Dialog>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2 mb-8">
         {stats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
@@ -369,39 +367,6 @@ export default function ChildrenManagementPage() {
           );
         })}
       </div>
-
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search children or parents..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8"
-              />
-            </div>
-            <Button variant="outline" className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              Filter
-            </Button>
-          </div>
-          <Tabs
-            defaultValue="all"
-            className="mt-4"
-            onValueChange={setActiveTab}
-          >
-            <TabsList>
-              <TabsTrigger value="all">All Children</TabsTrigger>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="inactive">Inactive</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </CardContent>
-      </Card>
 
       {isLoading ? (
         <div className="text-center py-12 flex flex-col items-center">
@@ -602,7 +567,6 @@ export default function ChildrenManagementPage() {
                           {child.specialNeeds || "None"}
                         </p>
                       </div>
-                
                     </div>
                   </div>
 
