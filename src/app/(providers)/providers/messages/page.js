@@ -120,20 +120,6 @@ const MessagesPage = () => {
     return <Badge variant={config.variant}>{config.text}</Badge>;
   };
 
-  const getPriorityBadge = (priority) => {
-    const priorityConfig = {
-      high: { variant: "destructive", text: "High Priority" },
-      medium: { variant: "default", text: "Medium Priority" },
-      low: { variant: "secondary", text: "Low Priority" },
-    };
-
-    const config = priorityConfig[priority] || {
-      variant: "outline",
-      text: priority,
-    };
-    return <Badge variant={config.variant}>{config.text}</Badge>;
-  };
-
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -156,7 +142,7 @@ const MessagesPage = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">
@@ -184,32 +170,6 @@ const MessagesPage = () => {
             </p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Tours Scheduled
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.toursScheduled}</div>
-            <p className="text-xs text-muted-foreground">
-              Upcoming facility tours
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              New Enrollments
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.newEnrollments}</div>
-            <p className="text-xs text-muted-foreground">This month</p>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
@@ -217,31 +177,7 @@ const MessagesPage = () => {
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Contacts</CardTitle>
-            <div className="flex space-x-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search contacts..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <Select value={activeTab} onValueChange={setActiveTab}>
-                <SelectTrigger className="w-[130px]">
-                  <SelectValue placeholder="Filter" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Contacts</SelectItem>
-                  <SelectItem value="interested">Interested</SelectItem>
-                  <SelectItem value="tour scheduled">Tour Scheduled</SelectItem>
-                  <SelectItem value="enrolled">Enrolled</SelectItem>
-                  <SelectItem value="follow up">Follow Up</SelectItem>
-                  <SelectItem value="not interested">Not Interested</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y">
@@ -266,9 +202,22 @@ const MessagesPage = () => {
                         </Avatar>
                         <div>
                           <div className="font-semibold">{contact.name}</div>
+
+                          {/* Proper child names display */}
                           <div className="text-sm text-muted-foreground">
-                            {contact.childName} ({contact.childAge} yrs)
+                            Childs
+                            {contact.children && contact.children.length > 0
+                              ? contact.children
+                                  .map((child) => child.full_name)
+                                  .join(", ")
+                              : "No children"}{" "}
+                            (
+                            {contact.children && contact.children.length > 0
+                              ? contact.children[0].age
+                              : "-"}{" "}
+                            yrs)
                           </div>
+
                           <div className="flex items-center mt-1">
                             {getStatusBadge(contact.status)}
                             {contact.unreadCount > 0 && (

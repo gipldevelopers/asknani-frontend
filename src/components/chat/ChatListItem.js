@@ -4,10 +4,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function ChatListItem({ chat }) {
+  const avatar =
+    process.env.NEXT_PUBLIC_BACKEND_URL + "/storage/" + chat.avatar;
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/chats/daycare/${chat.id}`);
+    router.push(`/chats/daycare/${chat.slug}`);
   };
 
   return (
@@ -19,7 +21,7 @@ export default function ChatListItem({ chat }) {
         <Image
           width={48}
           height={48}
-          src={chat.avatar}
+          src={avatar}
           alt={chat.daycareName}
           className="h-12 w-12 rounded-full object-cover"
         />
@@ -30,8 +32,12 @@ export default function ChatListItem({ chat }) {
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <h3 className="font-semibold text-gray-900 truncate">{chat.daycareName}</h3>
-          <span className="text-xs text-gray-500 whitespace-nowrap">{chat.timestamp}</span>
+          <h3 className="font-semibold text-gray-900 truncate">
+            {chat.daycareName}
+          </h3>
+          <span className="text-xs text-gray-500 whitespace-nowrap">
+            {chat.timestamp}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">

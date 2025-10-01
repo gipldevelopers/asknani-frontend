@@ -37,8 +37,10 @@ export default function ChatsPage() {
                 })
               : "",
             unreadCount: contact.unreadCount,
-            avatar: contact.avatar || "/images/default-daycare.jpg", // fallback image
+            avatar: contact.featured_photo || "/images/default-daycare.jpg", // fallback image
+            slug: contact.slug,
           }));
+
           setChats(mappedChats);
         } else {
           setError(res.data.message || "Failed to fetch contacts");
@@ -165,7 +167,11 @@ export default function ChatsPage() {
             <Image
               width={80}
               height={80}
-              src={activeChat.avatar}
+              src={
+                process.env.NEXT_PUBLIC_BACKEND_URL +
+                "/storage/" +
+                activeChat.avatar
+              }
               alt={activeChat.daycareName}
               className="w-20 h-20 rounded-full mb-4 ring-4 ring-primary/10"
             />

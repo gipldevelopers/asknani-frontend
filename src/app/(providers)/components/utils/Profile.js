@@ -13,6 +13,7 @@ import useAuthStore from "@/stores/AuthStore";
 import { useRouter } from "next/navigation";
 import useDaycareAuthStore from "@/stores/ProvidersStore";
 import { useEffect } from "react";
+import Link from "next/link";
 
 // ✅ use store logout
 export function ProfilePopover() {
@@ -79,18 +80,12 @@ export function ProfilePopover() {
 
         {/* Actions */}
         <div className="py-2">
-          <button className="w-full px-4 py-2 text-sm flex items-center gap-2 hover:bg-accent">
-            <User className="h-4 w-4" />
-            View Profile
-          </button>
-          <button className="w-full px-4 py-2 text-sm flex items-center gap-2 hover:bg-accent">
-            <Building2 className="h-4 w-4" />
-            Switch Organization
-          </button>
+          <Link href={"/providers/settings"}>
           <button className="w-full px-4 py-2 text-sm flex items-center gap-2 hover:bg-accent">
             <Settings className="h-4 w-4" />
             Settings
           </button>
+          </Link>
         </div>
 
         <Separator />

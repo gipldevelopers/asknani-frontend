@@ -1,5 +1,4 @@
 // contacts-api.js
-
 import API from "./api";
 
 export const contactsAPI = {
@@ -8,23 +7,18 @@ export const contactsAPI = {
     const response = await API.get("/contacts");
     return response.data;
   },
-  getContactMessages: async (daycareId, parentId, lastId = 0) => {
-    const response = await API.get(
-      `/chat/${daycareId}/messages?last_id=${lastId}&parent_id=${parentId}`
-    );
-    return response.data;
-  },
-  // Get stats for the provider
-  getStats: async () => {
-    const response = await API.get("/contacts/stats");
-    return response.data;
-  },
 
   // Get messages for a specific contact
   getContactMessages: async (daycareId, parentId, lastId = 0) => {
     const response = await API.get(
       `/chat/${daycareId}/messages?last_id=${lastId}&parent_id=${parentId}`
     );
+    return response.data;
+  },
+
+  // Get stats for the provider
+  getStats: async () => {
+    const response = await API.get("/contacts/stats");
     return response.data;
   },
 

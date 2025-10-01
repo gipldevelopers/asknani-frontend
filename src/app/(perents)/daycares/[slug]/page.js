@@ -217,7 +217,7 @@ export default function DaycareDetailPage({ params }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-49">
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
@@ -278,7 +278,7 @@ export default function DaycareDetailPage({ params }) {
                       </Link>
                     </Button>
                     <Button variant="outline" asChild>
-                      <Link href={`/chats/daycare/${d.id}`}>
+                      <Link href={`/chats/daycare/${slug}`}>
                         <MessageCircle className="w-4 h-4 mr-2" />
                         Message Daycare
                       </Link>
@@ -614,7 +614,7 @@ export default function DaycareDetailPage({ params }) {
                     <Link href={`/booking/${d.slug}`}>Book & Pay Now</Link>
                   </Button>
                   <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/chats/daycare/${d.id}`}>
+                    <Link href={`/chats/daycare/${slug}`}>
                       <MessageCircle className="w-4 h-4 mr-2" />
                       Message Daycare
                     </Link>
@@ -622,8 +622,6 @@ export default function DaycareDetailPage({ params }) {
                 </div>
               </CardContent>
             </Card>
-
-    
 
             {/* Safety Card */}
             <Card>
