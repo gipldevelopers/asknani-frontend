@@ -12,7 +12,9 @@ export function middleware(req) {
   if (tokenCookie) {
     try {
       const base64Url = tokenCookie.split(".")[1];
-      const payload = JSON.parse(Buffer.from(base64Url, "base64").toString("utf8"));
+      const payload = JSON.parse(
+        Buffer.from(base64Url, "base64").toString("utf8")
+      );
       role = payload.role;
     } catch (err) {
       // Invalid token → ignore
