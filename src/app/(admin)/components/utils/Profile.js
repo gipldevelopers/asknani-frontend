@@ -8,35 +8,49 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Settings, LogOut, User, Building2 } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import useAuthStore from "@/stores/AuthStore";
 import { useRouter } from "next/navigation";
 
-// ✅ use store logout
 export function ProfilePopover() {
   const router = useRouter();
-  const { logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
+
   const handleLogout = async () => {
     await logout();
     router.replace("/login");
   };
-  const { user } = useAuthStore();
+
+  // Fallback values
+  const userName = user?.full_name || "Unknown User";
+  const userRole = user?.role?.toUpperCase() || "USER";
+  const profilePhoto = user?.profile_photo
+    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${user.profile_photo}`
+    : null;
+  const initials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <Popover className="p-2">
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className="h-10 px-2 lg:px-3 flex items-center gap-2 p-2"
+          className="h-10 px-2 lg:px-3 flex items-center gap-2"
         >
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/avatar.png" alt="Rajesh Kumar" />
-            <AvatarFallback>RK</AvatarFallback>
+            {profilePhoto ? (
+              <AvatarImage src={profilePhoto} alt={userName} />
+            ) : (
+              <AvatarFallback>{initials}</AvatarFallback>
+            )}
           </Avatar>
 
-          {/* Text only on large screens (your original block) */}
           <div className="hidden lg:flex lg:flex-col lg:items-start lg:leading-tight text-left">
-            <span className="text-sm font-semibold text-gray-900">admin</span>
-            <span className="text-xs text-gray-500">Sunshine Daycare</span>
+            <span className="text-sm font-semibold text-gray-900">{userName}</span>
+            <span className="text-xs text-gray-500">{userRole}</span>
           </div>
         </Button>
       </PopoverTrigger>
@@ -45,14 +59,15 @@ export function ProfilePopover() {
         {/* Header */}
         <div className="px-4 py-3 flex items-center gap-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src="/avatar.png" alt="user profile" />
-            <AvatarFallback>RK</AvatarFallback>
+            {profilePhoto ? (
+              <AvatarImage src={profilePhoto} alt={userName} />
+            ) : (
+              <AvatarFallback>{initials}</AvatarFallback>
+            )}
           </Avatar>
           <div className="leading-tight">
-            <div className="text-sm font-semibold"> admin</div>
-            <div className="text-xs text-muted-foreground">
-              Sunshine Daycare
-            </div>
+            <div className="text-sm font-semibold">{userName}</div>
+            <div className="text-xs text-muted-foreground">{userRole}</div>
           </div>
         </div>
 
@@ -60,14 +75,6 @@ export function ProfilePopover() {
 
         {/* Actions */}
         <div className="py-2">
-          <button className="w-full px-4 py-2 text-sm flex items-center gap-2 hover:bg-accent">
-            <User className="h-4 w-4" />
-            View Profile
-          </button>
-          <button className="w-full px-4 py-2 text-sm flex items-center gap-2 hover:bg-accent">
-            <Building2 className="h-4 w-4" />
-            Switch Organization
-          </button>
           <button className="w-full px-4 py-2 text-sm flex items-center gap-2 hover:bg-accent">
             <Settings className="h-4 w-4" />
             Settings

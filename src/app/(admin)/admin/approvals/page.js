@@ -3,12 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -18,8 +13,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Building2 } from "lucide-react";
-import { approveDaycare, getPendingDaycares, rejectDaycare } from "@/lib/schemas/daycareService";
-
+import {
+  approveDaycare,
+  getPendingDaycares,
+  rejectDaycare,
+} from "@/lib/schemas/daycareService";
 
 export default function DaycareApprovalsPage() {
   const [daycares, setDaycares] = useState([]);
@@ -46,9 +44,7 @@ export default function DaycareApprovalsPage() {
         await rejectDaycare(id);
       }
       setDaycares((prev) =>
-        prev.map((d) =>
-          d.id === id ? { ...d, status: action } : d
-        )
+        prev.map((d) => (d.id === id ? { ...d, status: action } : d))
       );
     } catch (err) {
       console.error("Error updating daycare", err.response?.data || err);
@@ -108,18 +104,14 @@ export default function DaycareApprovalsPage() {
                           <Button
                             size="sm"
                             className="bg-green-600 text-white hover:bg-green-700"
-                            onClick={() =>
-                              handleAction(daycare.id, "Approved")
-                            }
+                            onClick={() => handleAction(daycare.id, "Approved")}
                           >
                             Approve
                           </Button>
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() =>
-                              handleAction(daycare.id, "Rejected")
-                            }
+                            onClick={() => handleAction(daycare.id, "Rejected")}
                           >
                             Reject
                           </Button>
