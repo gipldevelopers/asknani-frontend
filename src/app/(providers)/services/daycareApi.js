@@ -6,7 +6,7 @@ export const daycareApi = {
 
   // Create or update daycare
   saveDaycare: (data) =>
-    API.post("/provider/daycare/", data, {
+    API.post("/provider/daycare", data, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
