@@ -20,7 +20,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "asknani.gohilinfotech.com/",
+        hostname: "asknani.gohilinfotech.com",
       },
     ],
   },
