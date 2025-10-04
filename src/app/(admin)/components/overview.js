@@ -1,4 +1,6 @@
-// components/admin-dashboard/overview.jsx
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -17,42 +19,73 @@ import {
   Activity,
 } from "lucide-react";
 import Link from "next/link";
+import API from "@/lib/api";
+ // <-- your API helper
 
 export default function AdminDashboardOverview() {
-  const stats = [
-    {
-      title: "Total Cities",
-      value: "15",
-      change: "+2",
-      trend: "up",
-      icon: Building2,
-      description: "Added this month",
-    },
-    {
-      title: "Registered Daycares",
-      value: "128",
-      change: "+8",
-      trend: "up",
-      icon: School,
-      description: "Active listings",
-    },
-    {
-      title: "Users",
-      value: "4,520",
-      change: "+320",
-      trend: "up",
-      icon: Users,
-      description: "Parents & Providers",
-    },
-    {
-      title: "Pending Approvals",
-      value: "6",
-      change: "-3",
-      trend: "down",
-      icon: BadgeCheck,
-      description: "Daycares waiting",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [quickReports, setQuickReports] = useState({});
+
+  useEffect(() => {
+    const fetchOverview = async () => {
+      try {
+        const res = await API.get("/admin/dashboard/overview");
+        const data = res.data;
+
+        // map backend response into UI format
+        const formattedStats = [
+          {
+            title: "Total Cities",
+            value: data.stats.totalCities,
+            change: "+0", // TODO: add trend calculation if needed
+            trend: "up",
+            icon: Building2,
+            description: "Added this month",
+          },
+          {
+            title: "Registered Daycares",
+            value: data.stats.registeredDaycares,
+            change: "+0",
+            trend: "up",
+            icon: School,
+            description: "Active listings",
+          },
+          {
+            title: "Users",
+            value: data.stats.users,
+            change: "+0",
+            trend: "up",
+            icon: Users,
+            description: "Parents & Providers",
+          },
+          {
+            title: "Pending Approvals",
+            value: data.stats.pendingApprovals,
+            change: "-0",
+            trend: "down",
+            icon: BadgeCheck,
+            description: "Daycares waiting",
+          },
+        ];
+
+        setStats(formattedStats);
+        setRecentActivities(data.recentActivities || []);
+        setQuickReports(data.quickReports || {});
+      } catch (error) {
+        console.error("Failed to load admin dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOverview();
+  }, []);
+
+  if (loading) {
+    return <p>Loading dashboard...</p>;
+  }
 
   return (
     <div>
@@ -109,30 +142,38 @@ export default function AdminDashboardOverview() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[1, 2, 3].map((item) => (
-                <div
-                  key={item}
-                  className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Activity className="h-5 w-5 text-primary" />
+              {recentActivities.length > 0 ? (
+                recentActivities.map((activity, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Activity className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">
+                          {activity.status === "approved"
+                            ? "Daycare approved"
+                            : "New daycare registered"}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {activity.name} - {activity.city}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">New daycare registered</p>
-                      <p className="text-sm text-gray-500">
-                        Little Stars Preschool - Mumbai
-                      </p>
+                    <div className="text-right">
+                      <p className="font-medium">{activity.createdAt}</p>
+                      <Button variant="outline" size="sm" className="mt-1">
+                        Review
+                      </Button>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium">Today, 11:00 AM</p>
-                    <Button variant="outline" size="sm" className="mt-1">
-                      Review
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No recent activity</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -147,15 +188,21 @@ export default function AdminDashboardOverview() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="font-medium">Most Active City</p>
-                <p className="text-sm text-gray-500">Ahmedabad</p>
+                <p className="text-sm text-gray-500">
+                  {quickReports.mostActiveCity || "-"}
+                </p>
               </div>
               <div className="flex items-center justify-between">
                 <p className="font-medium">Top Rated Daycare</p>
-                <p className="text-sm text-gray-500">Happy Kids, Surat</p>
+                <p className="text-sm text-gray-500">
+                  {quickReports.topRatedDaycare || "-"}
+                </p>
               </div>
               <div className="flex items-center justify-between">
                 <p className="font-medium">New Users This Week</p>
-                <p className="text-sm text-gray-500">420</p>
+                <p className="text-sm text-gray-500">
+                  {quickReports.newUsersThisWeek || 0}
+                </p>
               </div>
             </div>
             <Link href={"/admin/reports"}>
