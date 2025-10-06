@@ -83,69 +83,79 @@ const useSearchStore = create((set, get) => ({
     }
   },
 
-  // Search with debouncing support
-  fetchResults: async () => {
-    const {
-      searchQuery,
-      selectedCity,
-      selectedCategories,
-      minRating,
-      maxPrice,
-      sortBy,
-      cities,
-    } = get();
 
-    // Don't search if no meaningful filters are applied
-    if (
+// Search with debouncing support
+fetchResults: async () => {
+  const {
+    searchQuery,
+    selectedCity,
+    selectedCategories,
+    minRating,
+    maxPrice,
+    sortBy,
+    cities,
+  } = get();
+
+  set({ loading: true, error: null });
+
+  try {
+    let params = {};
+
+    // If no filters or search are applied, fetch all daycares
+    const noFilters =
       !searchQuery &&
       selectedCity === "All Cities" &&
       selectedCategories.length === 0 &&
       minRating === 0 &&
-      maxPrice === 1000
-    ) {
-      set({ results: [], hasSearched: false });
+      maxPrice === 1000;
+
+    if (noFilters) {
+      const response = await DaycaresServices.getDaycares();
+      set({
+        results: response.data.daycares || [],
+        hasSearched: false,
+        loading: false,
+      });
       return;
     }
 
-    set({ loading: true, error: null, hasSearched: true });
-
-    try {
-      // Convert city name to ID if needed
-      let cityId = undefined;
-      if (selectedCity !== "All Cities") {
-        const city = cities.find((c) => c.name === selectedCity);
-        cityId = city?.id;
-      }
-
-      const params = {
-        search: searchQuery || undefined,
-        city_id: cityId,
-        categories:
-          selectedCategories.length > 0 ? selectedCategories : undefined,
-        min_rating: minRating > 0 ? minRating : undefined,
-        max_price: maxPrice < 1000 ? maxPrice : undefined,
-        sort: sortBy !== "relevance" ? sortBy : undefined,
-      };
-
-      // Clean undefined params
-      Object.keys(params).forEach(
-        (key) => params[key] === undefined && delete params[key]
-      );
-
-      const response = await DaycaresServices.searchDaycares(params);
-
-      set({
-        results: response.data.daycares || [],
-        loading: false,
-      });
-    } catch (err) {
-      set({
-        error: err.response?.data?.message || "Search failed",
-        loading: false,
-        results: [],
-      });
+    // Convert city name to ID if needed
+    let cityId = undefined;
+    if (selectedCity !== "All Cities") {
+      const city = cities.find((c) => c.name === selectedCity);
+      cityId = city?.id;
     }
-  },
+
+    params = {
+      search: searchQuery || undefined,
+      city_id: cityId,
+      categories:
+        selectedCategories.length > 0 ? selectedCategories : undefined,
+      min_rating: minRating > 0 ? minRating : undefined,
+      max_price: maxPrice < 1000 ? maxPrice : undefined,
+      sort: sortBy !== "relevance" ? sortBy : undefined,
+    };
+
+    // Clean undefined params
+    Object.keys(params).forEach(
+      (key) => params[key] === undefined && delete params[key]
+    );
+
+    const response = await DaycaresServices.searchDaycares(params);
+
+    set({
+      results: response.data.daycares || [],
+      hasSearched: true,
+      loading: false,
+    });
+  } catch (err) {
+    set({
+      error: err.response?.data?.message || "Search failed",
+      loading: false,
+      results: [],
+    });
+  }
+},
 
   // Get single daycare details
   fetchDaycareDetails: async (slug) => {

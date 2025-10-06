@@ -11,8 +11,6 @@ const useDaycareAuthStore = create((set) => ({
       const response = await API.get("/provider/daycare/info");
 
       set({ daycare: response.data.daycare });
-    
-      
     } catch (err) {
       console.error("Error fetching daycare info:", err);
     }

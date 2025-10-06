@@ -377,7 +377,7 @@ export default function DaycareListingsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {results.slice(0, showing).map((d) => (
                     <ResultCard
-                      key={d.id}
+                      key={d?.id}
                       d={d}
                       favs={favs}
                       onFav={toggleFav}
@@ -866,21 +866,85 @@ function FeaturedCard({ d, favs, onFav }) {
 
 // --- 7. ResultCard (Grid View) ---
 function ResultCard({ d, favs, onFav }) {
+  // Safely extract features/facilities - adjust based on your actual API structure
+  const getFeatures = () => {
+    // Try different possible locations for features/facilities
+    const features = d.facilities || d.features || d.tags || [];
+
+    // If features is an array of objects, extract names
+    if (features.length > 0 && typeof features[0] === "object") {
+      return features
+        .map((f) => f.name || f.title || f.facility_name || JSON.stringify(f))
+        .slice(0, 3);
+    }
+
+    // If features is an array of strings, use as-is
+    return features.slice(0, 3);
+  };
+
+  const displayFeatures = getFeatures();
+  const totalFeatures = d.facilities || d.features || d.tags || [];
+  const remainingCount = totalFeatures.length - displayFeatures.length;
+
+  // Safely get image URL - adjust based on your photos array
+  const getImageUrl = () => {
+    // If there's a featured_photo field
+    if (d.featured_photo) {
+      if (typeof d.featured_photo === "string") {
+        return `${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${d.featured_photo}`;
+      }
+      if (typeof d.featured_photo === "object") {
+        return (
+          d.featured_photo.url ||
+          d.featured_photo.image_path ||
+          "/placeholder-daycare.jpg"
+        );
+      }
+    }
+
+    // If there's a photos array, use the first photo
+    if (d.photos && d.photos.length > 0) {
+      const firstPhoto = d.photos[0];
+      if (typeof firstPhoto === "string") {
+        return `${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${firstPhoto}`;
+      }
+      if (typeof firstPhoto === "object") {
+        return `${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${firstPhoto.image_path}`;
+      }
+    }
+
+    return "/placeholder-daycare.jpg";
+  };
+
+  // Get location display text
+  const getLocation = () => {
+    if (d.location) return d.location;
+    if (d.city && typeof d.city === "object") return d.city.name;
+    if (d.city) return d.city;
+    return "Location not specified";
+  };
+
+  // Get price - adjust based on your API structure
+  const getPrice = () => {
+    return d.price || d.daily_rate || d.rate || "0";
+  };
+
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-md transition hover:shadow-xl">
       <div className="relative h-44 w-full overflow-hidden">
         <Image
           fill
-          src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/storage/${d.featured_photo}`}
-          alt={d.name}
+          src={getImageUrl()}
+          alt={d.name || "Daycare"}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
-        {d.isFeatured && (
-          <span className="absolute left-3 top-3 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
-            Featured
-          </span>
-        )}
+        {d.isFeatured ||
+          (d.featured && (
+            <span className="absolute left-3 top-3 rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-medium text-white shadow-sm">
+              Featured
+            </span>
+          ))}
         <button
           aria-label="Save to favourites"
           onClick={() => onFav(d.id)}
@@ -894,37 +958,39 @@ function ResultCard({ d, favs, onFav }) {
       <div className="p-4">
         <div className="mb-1 flex items-start justify-between gap-3">
           <h3 className="line-clamp-1 text-xl font-bold text-gray-900">
-            {d.name}
+            {d.name || "Unnamed Daycare"}
           </h3>
           <p className="shrink-0 text-xl font-bold text-indigo-600">
-            ₹ {d.price || "₹0/day"}
+            ₹{getPrice()}/day
           </p>
         </div>
         <div className="mb-2 flex items-center text-sm text-gray-600">
           <MapPin className="mr-1 h-4 w-4" />
-          <span className="line-clamp-1">{d.location || d.city}</span>
+          <span className="line-clamp-1">{getLocation()}</span>
         </div>
         <div className="mb-3 flex items-center gap-2">
           <RatingStars rating={d.rating} />
           <span className="text-xs text-gray-500">
-            ({d.reviewCount || 0} reviews)
+            ({d.reviewCount || d.reviews_count || 0} reviews)
           </span>
         </div>
-        <div className="flex flex-wrap gap-2 pt-1">
-          {(d.features || d.facilities || []).slice(0, 3).map((f, i) => (
-            <span
-              key={i}
-              className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700"
-            >
-              {f}
-            </span>
-          ))}
-          {(d.features || d.facilities || []).length > 3 && (
-            <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700">
-              +{(d.features || d.facilities || []).length - 3} more
-            </span>
-          )}
-        </div>
+        {displayFeatures.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {displayFeatures.map((f, i) => (
+              <span
+                key={i}
+                className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700"
+              >
+                {f}
+              </span>
+            ))}
+            {remainingCount > 0 && (
+              <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700">
+                +{remainingCount} more
+              </span>
+            )}
+          </div>
+        )}
         <div className="mt-4 flex items-center justify-between">
           <Link href={`/daycares/${d.slug || d.id}`}>
             <button className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition shadow-md">
